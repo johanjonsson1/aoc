@@ -1,10 +1,6 @@
 ﻿using AoC_Common;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static AoC_Common.SantaHelper;
 
 namespace AoC_2018
 {
@@ -44,7 +40,7 @@ namespace AoC_2018
 
     What is the checksum for your list of box IDs?
 
-            --- Part Two ---
+    --- Part Two ---
     Confident that your list of box IDs is complete, you're ready to find the boxes full of prototype fabric.
 
     The boxes will have IDs which differ by exactly one character at the same position in both strings. For example, given the following box IDs:
@@ -69,7 +65,6 @@ namespace AoC_2018
         public override void PartOne()
         {
             base.PartOne();
-
             var input = Inputs.Day2.ToStringList();
 
             var twos = 0;
@@ -96,9 +91,7 @@ namespace AoC_2018
         public override void PartTwo()
         {
             base.PartTwo();
-
             var input = Inputs.Day2.ToStringList();
-            //input.ForEach(line => { line = new string(line.OrderBy(o => o).ToArray()); });
             input = input.OrderBy(o => o).ToList();
 
             for (int i = 0; i < input.Count; i++)
@@ -127,7 +120,7 @@ namespace AoC_2018
                     Console.WriteLine(current);
                     Console.WriteLine(next);
                     Console.WriteLine(diffLetter);
-                    Console.WriteLine(current.Replace(diffLetter, ' ')); // wlkigsqyfecjqqmnxaktdrhbz
+                    Console.WriteLine(current.Replace(diffLetter.ToString(), "")); // wlkigsqyfecjqqmnxaktdrhbz
                     break;
                 }
             }
