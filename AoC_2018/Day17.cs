@@ -1,6 +1,7 @@
 ﻿using AoC_Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace AoC_2018
@@ -183,11 +184,12 @@ namespace AoC_2018
         public static int maxX = int.MinValue;
         public static int minY = 0;
         public static int maxY = 0;
-        HashSet<Clay> _groundGrid = new HashSet<Clay>();
-        List<Water> _water = new List<Water>();
-        public static List<Coordinate> _all = new List<Coordinate>();
+        //HashSet<Clay> _groundGrid = new HashSet<Clay>();
+        //public static Dictionary<Coordinate, Ground> _water = new Dictionary<Coordinate, Ground>();
+        public static Dictionary<Coordinate, Ground> _all = new Dictionary<Coordinate, Ground>();
         public static int WaterIdCount = 0;
         public static bool Reached = false;
+        public static Ground DefaultCoordinate = default;
 
         public override void PartOne()
         {
@@ -218,24 +220,29 @@ namespace AoC_2018
             //x=5, y=16..17
             //y=17, x=5..17
             //x=17, y=15..17".ToStringList(); // TEST
+            var sw = new Stopwatch();
+            sw.Start();
+            PopulateClay(clayInput, _all);
+            //_all.AddRange(_groundGrid);
 
-            PopulateClay(clayInput, _groundGrid);
-            _all.AddRange(_groundGrid);
-
-            var activeWater = new List<Water>(_water);
+            var activeWater = new List<Ground>();
 
             //PrintConsole();
             while (true)
             {
-                foreach (var w in activeWater)
+                int i = 0;
+                var max = activeWater.Count;
+                while (i < max)
                 {
-                    w.TryMove();
+                    var currentWater = activeWater[i];
+                    currentWater.TryMove();
 
-                    if(w.X == 500 && w.Y == 0)
+                    if (currentWater.Coordinate.X == 500 && currentWater.Coordinate.Y == 0)
                     {
                         Reached = true;
                         break;
                     }
+                    i++;
                 }
 
                 if (!Drip())
@@ -243,25 +250,37 @@ namespace AoC_2018
                     break;
                 }
 
-                activeWater = _water.Where(x => x.CanMove).ToList();
-                //PrintConsole();
-                if (_water.Count % 15000 == 0)
-                {
-                    //Print();
-                }
+                activeWater = GetActiveWater();
 
-                if (_water.Count % 3000 == 0)
-                {
-                    Console.Write('.');
-                }
+                //PrintConsole();
+                //if (_water.Count % 15000 == 0)
+                //{
+                //    //Print();
+                //}
+
+                //if (_water.Count % 3000 == 0)
+                //{
+                //    Console.Write('.');
+                //}
             }
 
             //PrintConsole();
-            Print();
+            //Print();
             Console.WriteLine();
-            Console.WriteLine(_water.Count);
-            var minY = _groundGrid.Min(g => g.Y);
-            Console.WriteLine(_water.Count(x => x.Y >= minY)); // 35707.
+            //Console.WriteLine(_water.Count);
+            Console.WriteLine(_all.Count(x => x.Value.IsWater));
+            var minY = _all.Values.Where(x => x.IsClay).Min(g => g.Coordinate.Y);
+            //Console.WriteLine(_water.Values.Count(x => x.Coordinate.Y >= minY)); // 35707.
+            Console.WriteLine(_all.Values.Count(x => x.IsWater && x.Coordinate.Y >= minY)); // 35707.
+            sw.Stop();
+            Console.WriteLine($"Completed in {sw.Elapsed}");
+        }
+
+        private List<Ground> GetActiveWater()
+        {
+            return _all.Values.Where(x => x.IsWater && x.CanMove).Select(s => s).ToList();
+            //return _water.Where(x => x.Value.CanMove).Select(s => s.Value).ToList();
+            //return _water.Where(x => x.Value.CanMove).Select(s => s).ToDictionary(t => t.Key, v => v.Value);
         }
 
         public override void PartTwo()
@@ -270,94 +289,95 @@ namespace AoC_2018
             Console.WriteLine("manual file count"); // 29293.
         }
 
-        private void PrintConsole()
-        {
-            Console.WriteLine();
-            for (int i = minY; i <= maxY; i++)
-            {
-                for (int j = minX - 1; j <= maxX + 1; j++)
-                {
-                    if (_groundGrid.Any(a => a.X == j && a.Y == i))
-                    {
-                        Console.Write('#');
-                        continue;
-                    }
+        //private void PrintConsole()
+        //{
+        //    Console.WriteLine();
+        //    for (int i = minY; i <= maxY; i++)
+        //    {
+        //        for (int j = minX - 1; j <= maxX + 1; j++)
+        //        {
+        //            if (_all.Values.Any(a => a.IsClay && a.Coordinate.X == j && a.Coordinate.Y == i))
+        //            {
+        //                Console.Write('#');
+        //                continue;
+        //            }
 
-                    var first = _water.FirstOrDefault(a => a.X == j && a.Y == i);
-                    if (first != null)
-                    {
-                        if (first.X == 500 && first.Y == 0)
-                        {
-                            Console.Write('+');
-                        }
-                        else if (first.Infinite)
-                        {
-                            Console.Write('i');
-                        }
-                        else if (first.CanMove == false)
-                        {
-                            Console.Write('c');
-                        }
-                        else
-                        {
-                            Console.Write('~');
-                        }
-                    }
-                    else
-                    {
-                        Console.Write('.');
-                    }
-                }
-                Console.WriteLine();
-            }
-        }
+        //            //var first = _water.Values.FirstOrDefault(a => a.Coordinate.X == j && a.Coordinate.Y == i);
+        //            if (_water.TryGetValue(new Coordinate(j,i), out var first))
+        //            //if (first != null)
+        //            {
+        //                if (first.Coordinate.X == 500 && first.Coordinate.Y == 0)
+        //                {
+        //                    Console.Write('+');
+        //                }
+        //                else if (first.Infinite)
+        //                {
+        //                    Console.Write('i');
+        //                }
+        //                else if (first.CanMove == false)
+        //                {
+        //                    Console.Write('c');
+        //                }
+        //                else
+        //                {
+        //                    Console.Write('~');
+        //                }
+        //            }
+        //            else
+        //            {
+        //                Console.Write('.');
+        //            }
+        //        }
+        //        Console.WriteLine();
+        //    }
+        //}
 
-        private void Print()
-        {
-            var date = DateTime.UtcNow.Ticks;
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"buckets_"+date+".txt", false))
-            {
-                file.WriteLine();
-                for (int i = minY; i <= maxY; i++)
-                {
-                    for (int j = minX - 1; j <= maxX + 1; j++)
-                    {
-                        if (_groundGrid.Any(a => a.X == j && a.Y == i))
-                        {
-                            file.Write('#');
-                            continue;
-                        }
+        //private void Print()
+        //{
+        //    var date = DateTime.UtcNow.Ticks;
+        //    using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"buckets_"+date+".txt", false))
+        //    {
+        //        file.WriteLine();
+        //        for (int i = minY; i <= maxY; i++)
+        //        {
+        //            for (int j = minX - 1; j <= maxX + 1; j++)
+        //            {
+        //                if (_groundGrid.Any(a => a.X == j && a.Y == i))
+        //                {
+        //                    file.Write('#');
+        //                    continue;
+        //                }
 
-                        var first = _water.FirstOrDefault(a => a.X == j && a.Y == i);
-                        if (first != null)
-                        {
-                            if (first.X == 500 && first.Y == 0)
-                            {
-                                file.Write('+');
-                            }
-                            else if (first.Infinite)
-                            {
-                                file.Write('i');
-                            }
-                            else if (first.CanMove == false)
-                            {
-                                file.Write('~');
-                            }
-                            else
-                            {
-                                file.Write('|');
-                            }                       
-                        }
-                        else
-                        {
-                            file.Write('.');
-                        }
-                    }
+        //                var first = _water.FirstOrDefault(a => a.X == j && a.Y == i);
+        //                if (first != null)
+        //                {
+        //                    if (first.X == 500 && first.Y == 0)
+        //                    {
+        //                        file.Write('+');
+        //                    }
+        //                    else if (first.Infinite)
+        //                    {
+        //                        file.Write('i');
+        //                    }
+        //                    else if (first.CanMove == false)
+        //                    {
+        //                        file.Write('~');
+        //                    }
+        //                    else
+        //                    {
+        //                        file.Write('|');
+        //                    }                       
+        //                }
+        //                else
+        //                {
+        //                    file.Write('.');
+        //                }
+        //            }
 
-                    file.Write(Environment.NewLine);
-                }
-            }
-        }
+        //            file.Write(Environment.NewLine);
+        //        }
+        //    }
+        //}
 
         private bool Drip()
         {
@@ -366,14 +386,14 @@ namespace AoC_2018
                 return false;
             }
 
-            var newDrop = new Water(500, 0);
-            _water.Add(newDrop);
-            _all.Add(newDrop);
+            var newDrop = new Ground(500, 0, true, false);
+            //_water.Add(newDrop.Coordinate, newDrop);
+            _all.Add(newDrop.Coordinate, newDrop);
 
             return true;
         }
 
-        private void PopulateClay(List<string> clayInput, HashSet<Clay> groundGrid)
+        private void PopulateClay(List<string> clayInput, Dictionary<Coordinate, Ground> groundGrid)
         {
             foreach (var line in clayInput)
             {
@@ -390,7 +410,11 @@ namespace AoC_2018
 
                     for (int y = yStart; y <= yEnd; y++)
                     {
-                        groundGrid.Add(new Clay(x, y));
+                        var ground = new Ground(x, y, false, true);
+                        if (!groundGrid.ContainsKey(ground.Coordinate))
+                        {
+                            groundGrid.Add(ground.Coordinate, ground);
+                        }
                     }
                 }
                 else
@@ -404,7 +428,11 @@ namespace AoC_2018
 
                     for (int x = xStart; x <= xEnd; x++)
                     {
-                        groundGrid.Add(new Clay(x, y));
+                        var ground = new Ground(x, y, false, true);
+                        if (!groundGrid.ContainsKey(ground.Coordinate))
+                        {
+                            groundGrid.Add(ground.Coordinate, ground);
+                        }
                     }
                 }
             }
@@ -438,14 +466,11 @@ namespace AoC_2018
         }
     }
 
-    public class Coordinate
+    public struct Coordinate : IEquatable<Coordinate>
     {
         public int X;
         public int Y;
-        public bool CanMove;
-        public bool Infinite;
-        public bool Top;
-        public bool IsWater;
+
         public Coordinate(int x, int y)
         {
             X = x;
@@ -459,32 +484,60 @@ namespace AoC_2018
                    Y == coordinate.Y;
         }
 
+        public bool Equals(Coordinate other)
+        {
+            return X == other.X &&
+                   Y == other.Y;
+        }
+
         public override int GetHashCode()
         {
-            var hashCode = 1861411795;
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            return hashCode;
+            return X.GetHashCode() + Y.GetHashCode();
         }
     }
 
-    public class Clay : Coordinate
+    public struct Ground : IEquatable<Ground>
     {
-        public Clay(int x, int y) : base(x, y)
+        //public int X;
+        //public int Y;
+        public Coordinate Coordinate;
+        public bool CanMove;
+        public bool Infinite;
+        public bool Top;
+        public bool IsWater;
+        public bool IsClay;
+
+        public Ground(int x, int y, bool isWater, bool isClay)
         {
-            IsWater = false;
+            Coordinate.X = x;
+            Coordinate.Y = y;
+            CanMove = !isClay;
+            Infinite = false;
+            Top = false;
+            IsWater = isWater;
+            IsClay = isClay;
         }
-    }
 
-    public class Water : Coordinate
-    {
-        public int Id;
-
-        public Water(int x, int y) : base(x, y)
+        public override bool Equals(object obj)
         {
-            Id = ++Day17.WaterIdCount;
-            IsWater = true;
-            CanMove = true;
+            return obj is Ground ground &&
+                   Coordinate.X == ground.Coordinate.X &&
+                   Coordinate.Y == ground.Coordinate.Y;
+        }
+
+        public bool Equals(Ground other)
+        {
+            return Coordinate.X == other.Coordinate.X &&
+                   Coordinate.Y == other.Coordinate.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            //var hashCode = 1861411795;
+            //hashCode = hashCode * -1521134295 + Coordinate.X.GetHashCode();
+            //hashCode = hashCode * -1521134295 + Coordinate.Y.GetHashCode();
+            //return hashCode;
+            return Coordinate.GetHashCode();
         }
 
         public void TryMove()
@@ -494,112 +547,138 @@ namespace AoC_2018
                 return;
             }
 
-            Coordinate below = null;
-            Coordinate left = null;
-            Coordinate right = null;
-            Coordinate leftLeft = null;
+            //Ground below = Day17.DefaultCoordinate;
+            //Ground left = Day17.DefaultCoordinate;
+            //Ground right = Day17.DefaultCoordinate;
+            //Ground leftLeft = Day17.DefaultCoordinate;
 
-            var count = 0;
-            foreach (Coordinate a in Day17._all)
+            if(!Day17._all.TryGetValue(new Coordinate(Coordinate.X, Coordinate.Y+1), out var below))
             {
-                if (a.X == X && a.Y == Y + 1)
-                {
-                    below = a;
-                    count++;
-                }
-                else if (a.X == X - 1 && a.Y == Y)
-                {
-                    left = a;
-                    count++;
-                }
-                else if (a.X == X + 1 && a.Y == Y)
-                {
-                    right = a;
-                    count++;
-                }
-                else if (a.X == X - 2 && a.Y == Y)
-                {
-                    leftLeft = a;
-                    count++;
-                }
-
-                if (count == 4)
-                {
-                    break;
-                }
+                below = Day17.DefaultCoordinate;
             }
 
-            if (below == null)
+            if (!Day17._all.TryGetValue(new Coordinate(Coordinate.X-1, Coordinate.Y), out var left))
             {
-                Y = Y + 1;
+                left = Day17.DefaultCoordinate;
+            }
+
+            if (!Day17._all.TryGetValue(new Coordinate(Coordinate.X+1, Coordinate.Y), out var right))
+            {
+                right = Day17.DefaultCoordinate;
+            }
+
+            if (!Day17._all.TryGetValue(new Coordinate(Coordinate.X-2, Coordinate.Y), out var leftLeft))
+            {
+                leftLeft = Day17.DefaultCoordinate;
+            }
+
+            if (below.Equals(Day17.DefaultCoordinate))
+            {
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
+                Coordinate.Y++;
                 Top = false;
 
-                if (Y == Day17.maxY)
+                if (Coordinate.Y == Day17.maxY)
                 {
                     CanMove = false;
                     Infinite = true;
                 }
-
+                
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
             else
-            {                
+            {
                 if (below.IsWater && below.Infinite)
                 {
+                    Day17._all.Remove(Coordinate);
+                    //Day17._water.Remove(Coordinate);
                     CanMove = false;
-                    Infinite = true;                 
-
+                    Infinite = true;
+                    Day17._all.Add(Coordinate, this);
+                    //Day17._water.Add(Coordinate, this);
                     return;
                 }
             }
 
-            if (left != null && right != null &&
+            if (!left.Equals(Day17.DefaultCoordinate) && !right.Equals(Day17.DefaultCoordinate) &&
                 left.IsWater && right.IsWater &&
                 left.Infinite && right.Infinite)
             {
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
                 CanMove = false;
                 Infinite = true;
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
 
             //down taken, try left
-            if (left == null)
+            if (left.Equals(Day17.DefaultCoordinate))
             {
-                X = X - 1;
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
+                Coordinate.X--;
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
             else if (left.Infinite)
             {
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
                 Top = true;
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
             }
 
             //left taken, try right
-            if (right == null)
+            if (right.Equals(Day17.DefaultCoordinate))
             {
-                X = X + 1;
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
+                Coordinate.X++;
 
-                if (left.IsWater && leftLeft != null && leftLeft.Infinite)
+                if (left.IsWater && !leftLeft.Equals(Day17.DefaultCoordinate) && leftLeft.Infinite)
                 {
                     Top = true;
                 }
+
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
-            else if ((right.IsWater && right.Infinite) ||
-                (left.IsWater && left.Infinite))
+            else if ((right.IsWater && right.Infinite)
+                || (left.IsWater && left.Infinite))
             {
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
                 CanMove = false;
                 Infinite = true;
                 Top = true;
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
             else if (Top && !right.IsWater)
             {
+                Day17._all.Remove(Coordinate);
+                //Day17._water.Remove(Coordinate);
                 CanMove = false;
                 Infinite = true;
+                Day17._all.Add(Coordinate, this);
+                //Day17._water.Add(Coordinate, this);
                 return;
             }
 
+            Day17._all.Remove(Coordinate);
+            //Day17._water.Remove(Coordinate);
             CanMove = false;
+            Day17._all.Add(Coordinate, this);
+            //Day17._water.Add(Coordinate, this);
         }
     }
 }
