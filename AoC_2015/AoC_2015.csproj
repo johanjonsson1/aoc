@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AoC_2015</RootNamespace>
     <AssemblyName>AoC_2015</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -59,6 +60,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AoC_2016\AoC_2016.csproj">
+      <Project>{d026fd56-2803-4361-aad7-6002826241a9}</Project>
+      <Name>AoC_2016</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AoC_2017\AoC_2017.csproj">
       <Project>{9b23d64e-4a58-4852-89be-59666875a82f}</Project>
       <Name>AoC_2017</Name>
