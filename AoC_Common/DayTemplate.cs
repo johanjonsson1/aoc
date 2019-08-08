@@ -9,7 +9,7 @@ using static AoC_Common.SantaHelper;
 namespace AoC_2018
 {
     /*
-     * 
+
     */
     public class DayTemplate : Day
     {
