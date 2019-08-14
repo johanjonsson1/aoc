@@ -9,12 +9,34 @@ namespace AoC_Common
     {
         public static List<int> ToInts(this IEnumerable<char> input)
         {
-            return input.Select(s => (int)Char.GetNumericValue(s)).ToList();
+            return input.Select(s => (int)char.GetNumericValue(s)).ToList();
         }
 
         public static List<string> ToStringList(this string input)
         {
             return input.Split('\r', '\n').Where(x => x != "").ToList();
+        }
+
+        public static Dictionary<int, List<char>> ToColumns(this List<string> input)
+        {
+            var dict = new Dictionary<int, List<char>>();
+
+            foreach (var line in input)
+            {
+                for (var i = 0; i < line.Length; i++)
+                {
+                    if (dict.TryGetValue(i, out var entry))
+                    {
+                        entry.Add(line[i]);
+                    }
+                    else
+                    {
+                        dict[i] = new List<char> { line[i] };
+                    }
+                }
+            }
+
+            return dict;
         }
 
         public static List<T> SplitByAs<T>(this string input, Func<string, T> converter, params char[] splitters)
