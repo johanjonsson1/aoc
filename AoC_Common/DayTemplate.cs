@@ -6,14 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using static AoC_Common.SantaHelper;
 
-namespace AoC_2018
+namespace AoC_201
 {
     /*
 
     */
+
     public class DayTemplate : Day
     {
-        public override string Title => "2018 - Day 0";
+        public override string Title => "";
 
         public override void PartOne()
         {
