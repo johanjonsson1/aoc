@@ -17,6 +17,15 @@ namespace AoC_Common
             return input.Split('\r', '\n').Where(x => x != "").ToList();
         }
 
+        public static string ToBinaryString(this string input)
+        {
+            return string.Join(string.Empty,
+                input.Select(
+                    c => Convert.ToString(Convert.ToInt32(c.ToString(), 16), 2).PadLeft(4, '0')
+                )
+            );
+        }
+
         public static Dictionary<int, List<char>> ToColumns(this List<string> input)
         {
             var dict = new Dictionary<int, List<char>>();

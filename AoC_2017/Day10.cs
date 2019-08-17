@@ -56,6 +56,37 @@ namespace AoC_2017
             Console.WriteLine(knotHash);
         }
 
+        public static string CreateKnotHash(List<int> asciiCodes)
+        {
+            var asciiPartTwo = new List<int> { 17, 31, 73, 47, 23 };
+            var lengths = new List<int>(asciiCodes.Concat(asciiPartTwo));
+
+            var circularList = new List<ListValue>();
+
+            for (int i = 0; i <= 255; i++)
+            {
+                circularList.Add(new ListValue(i, i));
+            }
+
+            var currentPos = 0;
+            var maxSizeIndex = 255;
+            var skipSize = 0;
+
+            for (int i = 0; i < 64; i++)
+            {
+                foreach (var length in lengths)
+                {
+                    currentPos = Loop(circularList, currentPos, maxSizeIndex, ref skipSize, length);
+                }
+            }
+
+            var parts16 = ToParts(circularList, 16);
+            var denseHash = parts16.Select(s => s.Aggregate((a, b) => a ^ b)).ToList();
+            var knotHash = string.Join("", denseHash.Select(s => s.ToString("x2")));
+
+            return knotHash;
+        }
+
         private static int Loop(List<ListValue> circularList, int currentPos, int maxSizeIndex, ref int skipSize, int length)
         {
             if (length > 1)
@@ -93,7 +124,7 @@ namespace AoC_2017
             return currentPos;
         }
 
-        public List<List<int>> ToParts(List<ListValue> source, int partSize)
+        public static List<List<int>> ToParts(List<ListValue> source, int partSize)
         {
             var parts = new List<List<int>>();
             var part = new List<int>();
