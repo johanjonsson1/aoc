@@ -164,16 +164,16 @@ namespace AoC_2017
 
     public class Generator
     {
-        private int Factor;
+        private readonly int _factor;
         private static int Divider = 2147483647;
-        private long Value;
+        private long _value;
         public bool LastInvalid = false;
         public int MultiplesOf;
 
         public Generator(int factor, int startValue, int multiplesOf)
         {
-            Factor = factor;
-            Value = startValue;
+            _factor = factor;
+            _value = startValue;
             MultiplesOf = multiplesOf;
         }
 
@@ -183,13 +183,13 @@ namespace AoC_2017
 
             if (MultiplesOf != 0)
             {
-                while (Value % MultiplesOf != 0)
+                while (_value % MultiplesOf != 0)
                 {
                     CreateNextValue();
                 }
             }
 
-            var bin = Convert.ToString(Value, 2);
+            var bin = Convert.ToString(_value, 2);
 
             if (bin.Length < 16)
             {
@@ -203,8 +203,8 @@ namespace AoC_2017
 
         private void CreateNextValue()
         {
-            var multiplied = Value * Factor;
-            Value = multiplied % Divider;
+            var multiplied = _value * _factor;
+            _value = multiplied % Divider;
         }
     }
 }
