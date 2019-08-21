@@ -85,5 +85,10 @@ namespace AoC_Common
         {
             return new string(input.Where(c => char.IsDigit(c)).ToArray());
         }
+
+        public static char AsChar(this string input)
+        {
+            return input[0];
+        }
     }
 }
