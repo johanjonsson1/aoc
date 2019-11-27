@@ -47,6 +47,7 @@
     <Compile Include="Day.cs" />
     <Compile Include="DayTemplate.cs" />
     <Compile Include="GridOfT.cs" />
+    <Compile Include="ICoordinate.cs" />
     <Compile Include="IDay.cs" />
     <Compile Include="Point3DOfT.cs" />
     <Compile Include="PointOfT.cs" />

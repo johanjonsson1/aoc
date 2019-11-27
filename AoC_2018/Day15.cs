@@ -20,7 +20,7 @@ namespace AoC_2018
             base.PartOne();
             // bygg cavern och combatants
             var allCombatants = new List<Combatant>();
-            var liveCombatants = allCombatants.Where(x => !x.Dead).OrderBy(o => o.Y).ThenBy(o => o.X).ToList();
+            var liveCombatants = allCombatants.Where(x => !x.Dead).OrderBy(o => o.Coordinate.Y).ThenBy(o => o.Coordinate.X).ToList();
             // printconsole
             var fullRounds = 0;
             while (true)
@@ -30,7 +30,7 @@ namespace AoC_2018
                     combatant.TakeTurn();
                 }
 
-                liveCombatants = allCombatants.Where(x => !x.Dead).OrderBy(o => o.Y).ThenBy(o => o.X).ToList();
+                liveCombatants = allCombatants.Where(x => !x.Dead).OrderBy(o => o.Coordinate.Y).ThenBy(o => o.Coordinate.X).ToList();
 
                 if (liveCombatants.Select(x => x.Race).Distinct().Count() == 1)
                 {
@@ -55,30 +55,23 @@ namespace AoC_2018
     {
         public Race Race;
         public int Id;
-        public int X;
-        public int Y;
+        public Coordinate Coordinate { get; set; }
         public bool Dead => HitPoints <= 0;
         public int HitPoints = 200;
-        private int AttackPower = 3;
-        private List<Combatant> _combatants;
+        private readonly int _attackPower = 3;
+        private readonly List<Combatant> _combatants;
 
         public Combatant(int id, int x, int y, Race race, List<Combatant> combatants)
         {
             Id = id;
-            X = x;
-            Y = y;
+            Coordinate = new Coordinate(x, y);
             Race = race;
             _combatants = combatants;
         }
 
         private List<Combatant> GetEnemiesOrderedByDistance()
         {
-            return _combatants.Where(x => x.Race != Race && x.Id != Id).OrderBy(o => o.DistanceFrom(X, Y)).ToList();
-        }
-
-        public int DistanceFrom(int x, int y)
-        {
-            return Math.Abs(X - x) + Math.Abs(Y - y);
+            return _combatants.Where(x => x.Race != Race && x.Id != Id).OrderBy(o => o.Coordinate.GetDistance(Coordinate)).ToList();
         }
 
         public void TakeTurn()
@@ -103,13 +96,7 @@ namespace AoC_2018
     {
         public int Id;
         public int Distance => Steps.Count;
-        public List<Square> Steps = new List<Square>();
-        public Square StartingPoint => Steps[0];
-    }
-
-    public class Square
-    {
-        public int X;
-        public int Y;
+        public List<Coordinate> Steps = new List<Coordinate>();
+        public Coordinate StartingPoint => Steps[0];
     }
 }

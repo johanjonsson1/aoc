@@ -3,6 +3,13 @@ using System.Linq;
 
 namespace AoC_Common
 {
+    public class Grid2D<TValue> where TValue : class, ICoordinate
+    {
+        private readonly List<TValue> _allItems = new List<TValue>();
+
+        
+    }
+
     public class Grid<TKey,TValue> 
         where TKey : struct 
         where TValue : class
