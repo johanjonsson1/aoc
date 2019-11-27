@@ -7,7 +7,7 @@ namespace AoC_2015
     {
         static void Main(string[] args)
         {
-            IDay day = new AoC_2018.Day15();
+            IDay day = new AoC_2017.Day20();
             Console.WriteLine($"Running puzzle {day.Title}");
             day.Run();
 
