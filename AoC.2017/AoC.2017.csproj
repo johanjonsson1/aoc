@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>AoC2017</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Day9.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Day9.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AoC.Common\AoC.Common.csproj" />
+  </ItemGroup>
+
+</Project>
