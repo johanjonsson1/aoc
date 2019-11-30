@@ -58,6 +58,27 @@ namespace AoC.Common
             }
         }
 
+        public void TurnAround()
+        {
+            switch (Facing)
+            {
+                case Face.Up:
+                    Facing = Face.Down;
+                    break;
+                case Face.Down:
+                    Facing = Face.Up;
+                    break;
+                case Face.Right:
+                    Facing = Face.Left;
+                    break;
+                case Face.Left:
+                    Facing = Face.Right;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
         public void Move(int distance)
         {
             var oldPos = CurrentCoordinate;

@@ -15,6 +15,11 @@ namespace AoC2017
         public override void PartOne()
         {
             base.PartOne();
+
+            //            var input = @"..#
+            //#..
+            //...".ToStringList();
+
             var input = @".......##.#..####.#....##
 ..###....###.####..##.##.
 #..####.#....#.#....##...
@@ -59,9 +64,9 @@ namespace AoC2017
             var centerX = (int) currentGrid.Average(a => a.Coordinate.X);
             var center = new Coordinate(centerX, centerY);
             infiniteGrid.TryGet(center, out var startNode);
-            var carrier = new VirusCarrier(center, startNode, infiniteGrid);
+            var carrier = new EvolvedVirusCarrier(center, startNode, infiniteGrid);
 
-            for (var i = 0; i < 10000; i++)
+            for (var i = 0; i < 10_000_000; i++)
             {
                 //Print(infiniteGrid, carrier.CurrentCoordinate);
                 carrier.PerformBurst();
@@ -96,6 +101,14 @@ namespace AoC2017
                         {
                             Console.Write("#");
                         }
+                        else if (node.CurrentState == Node.State.Weakened)
+                        {
+                            Console.Write("W");
+                        }
+                        else if (node.CurrentState == Node.State.Flagged)
+                        {
+                            Console.Write("F");
+                        }
                         else
                         {
                             Console.ForegroundColor = ConsoleColor.Green;
@@ -114,36 +127,70 @@ namespace AoC2017
         }
     }
 
+    public class EvolvedVirusCarrier : VirusCarrier
+    {
+        public EvolvedVirusCarrier(Coordinate startCoordinate, Node startNode, Grid<Coordinate, Node> grid) : base(
+            startCoordinate, startNode, grid)
+        {
+        }
+
+        public override void PerformBurst()
+        {
+            switch (CurrentNode.CurrentState)
+            {
+                case Node.State.Clean:
+                    Navigator.TurnLeft();
+                    CurrentNode.Weaken();
+                    break;
+                case Node.State.Weakened:
+                    CurrentNode.Infect();
+                    break;
+                case Node.State.Infected:
+                    Navigator.TurnRight();
+                    CurrentNode.Flag();
+                    break;
+                case Node.State.Flagged:
+                    Navigator.TurnAround();
+                    CurrentNode.Clean();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            Move();
+        }
+    }
+
     public class VirusCarrier
     {
         private readonly Grid<Coordinate, Node> _grid;
         public Coordinate CurrentCoordinate { get; private set; }
         //public AoC.Common.Navigator.Direction CurrentDirection { get; private set; }
         public Node CurrentNode { get; private set; }
-        private readonly AoC.Common.Navigator _navigator;
+        protected readonly AoC.Common.Navigator Navigator;
 
         public VirusCarrier(Coordinate startCoordinate, Node startNode, Grid<Coordinate, Node> grid)
         {
-            _navigator = new AoC.Common.Navigator(startCoordinate, AoC.Common.Navigator.Face.Up);
+            Navigator = new AoC.Common.Navigator(startCoordinate, AoC.Common.Navigator.Face.Up);
             _grid = grid;
             CurrentCoordinate = startCoordinate;
             //CurrentDirection = AoC.Common.Navigator.Direction.Up;
             CurrentNode = startNode;
         }
 
-        public void PerformBurst()
+        public virtual void PerformBurst()
         {
             //If the current node is infected, it turns to its right.Otherwise, it turns to its left.
             //(Turning is done in -place; the current node does not change.)
 
             if (CurrentNode.CurrentState != Node.State.Infected)
             {
-                _navigator.TurnLeft();
+                Navigator.TurnLeft();
                 CurrentNode.Infect();
             }
             else
             {
-                _navigator.TurnRight();
+                Navigator.TurnRight();
                 CurrentNode.Clean();
             }
 
@@ -153,11 +200,11 @@ namespace AoC2017
             Move();
         }
 
-        private void Move()
+        protected void Move()
         {
-            _navigator.Move(1);
+            Navigator.Move(1);
 
-            var newCoordinate = _navigator.CurrentCoordinate;
+            var newCoordinate = Navigator.CurrentCoordinate;
             CurrentCoordinate = newCoordinate;
 
             Node nextNode;
