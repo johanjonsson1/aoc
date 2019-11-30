@@ -7,7 +7,7 @@ namespace Runner
     {
         static void Main()
         {
-            IDay day = new AoC2017.Day21();
+            IDay day = new AoC2017.Day22();
             Console.WriteLine($"Running puzzle {day.Title}");
             day.Run();
 
