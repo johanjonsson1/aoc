@@ -66,6 +66,11 @@ namespace AoC.Common
             return input.SplitByAs(s => { return Convert.ToDecimal(s); }, splitters);
         }
 
+        public static List<double> SplitAsDoublesBy(this string input, params char[] splitters)
+        {
+            return input.SplitByAs(s => { return Convert.ToDouble(s); }, splitters);
+        }
+
         public static List<byte> SplitAsBytesBy(this string input, params char[] splitters)
         {
             return input.SplitByAs(s => { return Convert.ToByte(s); }, splitters);
