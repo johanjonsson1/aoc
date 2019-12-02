@@ -2,13 +2,13 @@
 using AoC.Common;
 using static AoC.Common.SantaHelper;
 
-namespace AoC
+namespace AoC2019
 {
     /*
 
     */
 
-    public class DayTemplate : Day
+    public class Day3 : Day
     {
         public override string Title => "";
 
