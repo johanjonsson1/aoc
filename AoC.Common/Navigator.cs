@@ -7,7 +7,7 @@ namespace AoC.Common
     {
         public Coordinate CurrentCoordinate { get; private set; }
         private Face Facing { get; set; }
-        private HashSet<Coordinate> VisitedCoordinates { get; } = new HashSet<Coordinate>();
+        public HashSet<Coordinate> VisitedCoordinates { get; } = new HashSet<Coordinate>();
 
         public Navigator(Coordinate startCoordinate, Face face)
         {
@@ -35,6 +35,11 @@ namespace AoC.Common
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public void FaceTo(Face face)
+        {
+            Facing = face;
         }
 
         public void TurnRight()

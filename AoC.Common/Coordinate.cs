@@ -1,9 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AoC.Common
 {
     public struct Coordinate : IEquatable<Coordinate>
     {
+        private sealed class XYEqualityComparer : IEqualityComparer<Coordinate>
+        {
+            public bool Equals(Coordinate x, Coordinate y)
+            {
+                return x.X == y.X && x.Y == y.Y;
+            }
+
+            public int GetHashCode(Coordinate obj)
+            {
+                unchecked
+                {
+                    return (obj.X * 397) ^ obj.Y;
+                }
+            }
+        }
+
+        public static IEqualityComparer<Coordinate> CoordinateComparer { get; } = new XYEqualityComparer();
+
         public int X;
         public int Y;
 
