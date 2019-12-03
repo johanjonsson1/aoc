@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AoC.Common;
 using static AoC.Common.SantaHelper;
@@ -6,96 +7,171 @@ using static AoC.Common.SantaHelper;
 namespace AoC2019
 {
     /*
+    --- Day 3: Crossed Wires ---
+    The gravity assist was successful, and you're well on your way to the Venus refuelling station. 
+    During the rush back on Earth, the fuel management system wasn't completely installed, so that's next on the priority list.
 
+    Opening the front panel reveals a jumble of wires. Specifically, two wires are connected to a central port and extend outward on a grid. 
+    You trace the path each wire takes as it leaves the central port, one wire per line of text (your puzzle input).
+
+    The wires twist and turn, but the two wires occasionally cross paths. 
+    To fix the circuit, you need to find the intersection point closest to the central port. 
+    Because the wires are on a grid, use the Manhattan distance for this measurement. 
+    While the wires do technically cross right at the central port where they both start, this point does not count, nor does a wire count as crossing with itself.
+
+    For example, if the first wire's path is R8,U5,L5,D3, then starting from the central port (o), it goes right 8, up 5, left 5, and finally down 3:
+
+    ...........
+    ...........
+    ...........
+    ....+----+.
+    ....|....|.
+    ....|....|.
+    ....|....|.
+    .........|.
+    .o-------+.
+    ...........
+    Then, if the second wire's path is U7,R6,D4,L4, it goes up 7, right 6, down 4, and left 4:
+
+    ...........
+    .+-----+...
+    .|.....|...
+    .|..+--X-+.
+    .|..|..|.|.
+    .|.-X--+.|.
+    .|..|....|.
+    .|.......|.
+    .o-------+.
+    ...........
+    These wires cross at two locations (marked X), but the lower-left one is closer to the central port: its distance is 3 + 3 = 6.
+
+    Here are a few more examples:
+
+    R75,D30,R83,U83,L12,D49,R71,U7,L72
+    U62,R66,U55,R34,D71,R55,D58,R83 = distance 159
+    R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+    U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = distance 135
+    What is the Manhattan distance from the central port to the closest intersection?
+
+    Your puzzle answer was 1337.
+
+    --- Part Two ---
+    It turns out that this circuit is very timing-sensitive; you actually need to minimize the signal delay.
+
+    To do this, calculate the number of steps each wire takes to reach each intersection; choose the intersection where the sum of both wires' steps is lowest. 
+    If a wire visits a position on the grid multiple times, use the steps value from the first time it visits that position when calculating the total value of a specific intersection.
+
+    The number of steps a wire takes is the total number of grid squares the wire has entered to get to that location, including the intersection being considered. 
+    Again consider the example from above:
+
+    ...........
+    .+-----+...
+    .|.....|...
+    .|..+--X-+.
+    .|..|..|.|.
+    .|.-X--+.|.
+    .|..|....|.
+    .|.......|.
+    .o-------+.
+    ...........
+    In the above example, the intersection closest to the central port is reached after 8+5+5+2 = 20 steps by the first wire and 7+6+4+3 = 20 steps by the second wire for a total of 20+20 = 40 steps.
+
+    However, the top-right intersection is better: the first wire takes only 8+5+2 = 15 and the second wire takes only 7+6+2 = 15, a total of 15+15 = 30 steps.
+
+    Here are the best steps for the extra examples from above:
+
+    R75,D30,R83,U83,L12,D49,R71,U7,L72
+    U62,R66,U55,R34,D71,R55,D58,R83 = 610 steps
+    R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+    U98,R91,D20,R16,D67,R40,U7,R15,U6,R7 = 410 steps
+    What is the fewest combined steps the wires must take to reach an intersection?
+
+    Your puzzle answer was 65356.
     */
 
     public class Day3 : Day
     {
-        public override string Title => "";
+        public override string Title => "--- Day 3: Crossed Wires ---";
 
         public override void PartOne()
         {
             base.PartOne();
-            var input = @"".ToStringList();
-            //var input = Inputs.Day3.ToStringList();
-
             var wire1 = Inputs.Day3.Split(','); //"R8,U5,L5,D3".Split(',');
             var wire2 = Inputs.Day3_2.Split(','); //"U7,R6,D4,L4".Split(',');
 
-            var counter = 0;
-            var navigator = new Navigator(new Coordinate(0,0), Navigator.Face.Right);
-            foreach (var instruction in wire1)
-            {
-                if (counter > 0)
-                {
-                    switch (instruction[0])
-                    {
-                        case 'R':
-                            navigator.FaceTo(Navigator.Face.Right);
-                            break;
-                        case 'L':
-                            navigator.FaceTo(Navigator.Face.Left);
-                            break;
-                        case 'U':
-                            navigator.FaceTo(Navigator.Face.Up);
-                            break;
-                        case 'D':
-                            navigator.FaceTo(Navigator.Face.Down);
-                            break;
-                    }
-                }
+            var visitedCoordinatesWire1 = NavigateWire(wire1);
+            var visitedCoordinatesWire2 = NavigateWire(wire2);
 
-                navigator.Move(Convert.ToInt32(instruction.RemoveAToZ()));
-                counter++;
-            }
-
-            counter = 0;
-            var navigator2 = new Navigator(new Coordinate(0, 0), Navigator.Face.Left);//Left
-            foreach (var instruction in wire2)
-            {
-                if (counter > 0)
-                {
-                    switch (instruction[0])
-                    {
-                        case 'R':
-                            navigator2.FaceTo(Navigator.Face.Right);
-                            break;
-                        case 'L':
-                            navigator2.FaceTo(Navigator.Face.Left);
-                            break;
-                        case 'U':
-                            navigator2.FaceTo(Navigator.Face.Up);
-                            break;
-                        case 'D':
-                            navigator2.FaceTo(Navigator.Face.Down);
-                            break;
-                    }
-                }
-
-                navigator2.Move(Convert.ToInt32(instruction.RemoveAToZ()));
-                counter++;
-            }
-
-            var center = new Coordinate(0,0);
-            var intersections = navigator.VisitedCoordinates.Where(x => !x.Equals(center))
-                .Intersect(navigator2.VisitedCoordinates, Coordinate.CoordinateComparer).OrderBy(o => o.GetDistance(center)).ToList();
-
-            var coord1 = navigator.VisitedCoordinates.ToList();
-            var coord2 = navigator2.VisitedCoordinates.ToList();
-
-            var closest  = intersections.Select(o => coord1.IndexOf(o) + coord2.IndexOf(o)).OrderBy(i => i);
+            var center = new Coordinate(0, 0);
+            var intersections = visitedCoordinatesWire1
+                .Where(x => !x.Equals(center))
+                .Intersect(visitedCoordinatesWire2, Coordinate.CoordinateComparer)
+                .OrderBy(o => o.GetDistance(center))
+                .ToList();
 
             Console.WriteLine(intersections.First().GetDistance(center));
-            Console.WriteLine(closest.First());
         }
 
         public override void PartTwo()
         {
             base.PartTwo();
-            var input = @"".ToStringList();
-            //var input = Inputs.Day3.ToStringList();
+            var wire1 = Inputs.Day3.Split(',');
+            var wire2 = Inputs.Day3_2.Split(',');
 
-            Console.WriteLine();
+            var visitedCoordinatesWire1 = NavigateWire(wire1);
+            var visitedCoordinatesWire2 = NavigateWire(wire2);
+
+            var center = new Coordinate(0, 0);
+            var intersections = visitedCoordinatesWire1
+                .Where(x => !x.Equals(center))
+                .Intersect(visitedCoordinatesWire2, Coordinate.CoordinateComparer)
+                .OrderBy(o => o.GetDistance(center))
+                .ToList();
+
+            var closest = intersections
+                .Select(o => visitedCoordinatesWire1.IndexOf(o) + visitedCoordinatesWire2.IndexOf(o))
+                .OrderBy(i => i);
+
+            Console.WriteLine(closest.First());
+        }
+
+        private static List<Coordinate> NavigateWire(string[] wire)
+        {
+            Navigator navigator = null;
+            for (var index = 0; index < wire.Length; index++)
+            {
+                var instruction = GetDirection(wire[index][0]);
+                var steps = Convert.ToInt32(wire[index].RemoveAToZ());
+
+                if (index == 0)
+                {
+                    navigator = new Navigator(new Coordinate(0, 0), instruction);
+                    navigator.Move(steps);
+                    continue;
+                }
+
+                navigator.FaceTo(instruction);
+                navigator.Move(steps);
+            }
+
+            return navigator.VisitedCoordinates;
+        }
+
+        private static Navigator.Face GetDirection(char c)
+        {
+            switch (c)
+            {
+                case 'R':
+                    return Navigator.Face.Right;
+                case 'L':
+                    return Navigator.Face.Left;
+                case 'U':
+                    return Navigator.Face.Up;
+                case 'D':
+                    return Navigator.Face.Down;
+            }
+
+            throw new ArgumentException();
         }
     }
 }
