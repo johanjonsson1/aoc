@@ -7,7 +7,7 @@ namespace AoC.Common
     {
         public Coordinate CurrentCoordinate { get; private set; }
         private Face Facing { get; set; }
-        public HashSet<Coordinate> VisitedCoordinates { get; } = new HashSet<Coordinate>();
+        public List<Coordinate> VisitedCoordinates { get; } = new List<Coordinate>();
 
         public Navigator(Coordinate startCoordinate, Face face)
         {
@@ -133,7 +133,7 @@ namespace AoC.Common
                 VisitedCoordinates.Add(newCoordinate);
             }
 
-            VisitedCoordinates.Add(CurrentCoordinate);
+            //VisitedCoordinates.Add(CurrentCoordinate);
         }
 
         public enum Face
