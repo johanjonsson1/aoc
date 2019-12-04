@@ -103,13 +103,14 @@ namespace AoC2019
             var visitedCoordinatesWire2 = NavigateWire(wire2);
 
             var center = new Coordinate(0, 0);
-            var intersections = visitedCoordinatesWire1
-                .Where(x => !x.Equals(center))
+            var closestIntersection = visitedCoordinatesWire1
+                .Where(coordinate => !coordinate.Equals(center))
                 .Intersect(visitedCoordinatesWire2, Coordinate.CoordinateComparer)
-                .OrderBy(o => o.GetDistance(center))
-                .ToList();
+                .OrderBy(intersection => intersection.GetDistance(center))
+                .ToList()
+                .First();
 
-            Console.WriteLine(intersections.First().GetDistance(center));
+            Console.WriteLine(closestIntersection.GetDistance(center));
         }
 
         public override void PartTwo()
@@ -128,11 +129,13 @@ namespace AoC2019
                 .OrderBy(o => o.GetDistance(center))
                 .ToList();
 
-            var closest = intersections
-                .Select(o => visitedCoordinatesWire1.IndexOf(o) + visitedCoordinatesWire2.IndexOf(o))
-                .OrderBy(i => i);
+            var closestIntersectionBySteps = intersections
+                .Select(coordinate =>
+                    visitedCoordinatesWire1.IndexOf(coordinate) + visitedCoordinatesWire2.IndexOf(coordinate))
+                .OrderBy(totalSteps => totalSteps)
+                .First();
 
-            Console.WriteLine(closest.First());
+            Console.WriteLine(closestIntersectionBySteps);
         }
 
         private static List<Coordinate> NavigateWire(string[] wire)
