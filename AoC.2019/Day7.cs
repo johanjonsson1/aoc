@@ -20,6 +20,7 @@ namespace AoC2019
         public override void PartOne()
         {
             base.PartOne();
+            return;
             var amplifiersSeries = new List<AmplifierSeries>();
             var bag = new ConcurrentBag<ThrusterResult>();
             CreateAllSeries(amplifiersSeries);
@@ -58,10 +59,209 @@ namespace AoC2019
             }
         }
 
+        private void CreateAllSeries2(List<AmplifierSeries> amplifiersSeries)
+        {
+            for (var i = 55555; i <= 99999; i++)
+            {
+                var amp = new AmplifierSeries(i);
+
+                if (!amp.BetweenFiveAndNine || !amp.IsDifferent)
+                {
+                    continue;
+                }
+
+                amplifiersSeries.Add(amp);
+            }
+        }
+
         public override void PartTwo()
         {
             base.PartTwo();
-            Console.WriteLine();
+            var amplifiersSeries = new List<AmplifierSeries>();
+            var bag = new ConcurrentBag<ThrusterResult>();
+            CreateAllSeries2(amplifiersSeries);
+
+            Parallel.ForEach(amplifiersSeries, s =>
+            {
+                var machines = new List<IntCodeMachine>();
+                //var thisInput = "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5".SplitAsIntsBy(',');
+                foreach (var amplifier in s.NextAmplifierValue)
+                {
+                    var thisInput = Inputs.Day7.SplitAsIntsBy(',');//"3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5".SplitAsIntsBy(',');
+                    machines.Add(new IntCodeMachine(amplifier, thisInput));
+                }
+
+                var currentOutput = 0;
+                while (machines.Any(a => a.IsTerminated == false))
+                {
+                    foreach (var intCodeMachine in machines)
+                    {
+                        intCodeMachine.LoopUntilHaltDay7(currentOutput);
+                        if (!intCodeMachine.IsTerminated)
+                        {
+                            currentOutput = intCodeMachine.Output;
+                        }
+                    }
+                }
+
+                var result = new ThrusterResult { Series = s, ThrusterSignal = currentOutput };
+                bag.Add(result);
+            });
+
+            //var amp = new AmplifierSeries(98765);
+            //var machines = new List<IntCodeMachine>();
+            ////var thisInput = "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5".SplitAsIntsBy(',');
+            //foreach (var amplifier in amp.NextAmplifierValue)
+            //{
+            //    var thisInput = "3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5".SplitAsIntsBy(',');
+            //    machines.Add(new IntCodeMachine(amplifier, thisInput));
+            //}
+
+            //var currentOutput = 0;
+            //while (machines.Any(a => a.IsTerminated == false))
+            //{
+            //    foreach (var intCodeMachine in machines)
+            //    {
+            //        intCodeMachine.LoopUntilHaltDay7(currentOutput);
+            //        if (!intCodeMachine.IsTerminated)
+            //        {
+            //            currentOutput = intCodeMachine.Output;
+            //        }
+            //    }
+            //}
+
+
+
+            var thrusterInput = bag.ToList().OrderByDescending(o => o.ThrusterSignal).FirstOrDefault();
+            Console.WriteLine(thrusterInput.ThrusterSignal);
+
+        }
+
+
+        public class IntCodeMachine
+        {
+            private readonly int _amplifier;
+            private List<int> _input;
+            private bool IsHalted = false;
+            public bool IsTerminated = false;
+            private int _index = 0;
+            public int Output = -1;
+            private bool OneInputUsed;
+
+            public IntCodeMachine(int amplifier, List<int> inputs)
+            {
+                _amplifier = amplifier;
+                _input = inputs;
+            }
+
+            public void LoopUntilHaltDay7(int inputFor3)
+            {
+                IsHalted = false;
+                IntCodeInstruction instr = null;
+                while (!IsHalted && !IsTerminated)
+                {
+                    instr = new IntCodeInstruction(_input[_index]);
+                    if (instr.OpCode == 99)
+                    {
+                        IsTerminated = true;
+                        break;
+                    }
+
+                    var value1 = instr.ImidiateModeValue1 ? _input[_index + 1] : _input[_input[_index + 1]];
+                    //var storageIndex = _input[_index + 3];
+
+                    if (instr.OpCode == 1)
+                    {
+                        _input[_input[_index + 3]] =
+                            value1 + (instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]]);
+                    }
+                    else if (instr.OpCode == 2)
+                    {
+                        _input[_input[_index + 3]] =
+                            value1 * (instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]]);
+                    }
+                    else if (instr.OpCode == 3)
+                    {
+                        value1 = _input[_index + 1];
+                        if (OneInputUsed == true)
+                        {
+                            _input[value1] = inputFor3; // INPUT
+                        }
+                        else
+                        {
+                            _input[value1] = _amplifier; // INPUT
+                            OneInputUsed = true;
+                        }
+                    }
+                    else if (instr.OpCode == 4)
+                    {
+                        value1 = _input[_index + 1];
+                        //Console.WriteLine(input[value1]);
+                        Output = _input[value1];
+                        IsHalted = true;
+                    }
+                    else if (instr.OpCode == 5)
+                    {
+                        //Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+                        if (value1 != 0)
+                        {
+                            _index = instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]];
+                        }
+                        else
+                        {
+                            _index += 3;
+                        }
+
+                        continue;
+                    }
+                    else if (instr.OpCode == 6)
+                    {
+                        //Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+                        if (value1 == 0)
+                        {
+                            _index = instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]];
+                        }
+                        else
+                        {
+                            _index += 3;
+                        }
+
+                        continue;
+                    }
+                    else if (instr.OpCode == 7)
+                    {
+                        //Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+                        if (value1 < (instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]]))
+                        {
+                            _input[_input[_index + 3]] = 1;
+                        }
+                        else
+                        {
+                            _input[_input[_index + 3]] = 0;
+                        }
+                    }
+                    else if (instr.OpCode == 8)
+                    {
+                        //Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+                        if (value1 == (instr.ImidiateModeValue2 ? _input[_index + 2] : _input[_input[_index + 2]]))
+                        {
+                            _input[_input[_index + 3]] = 1;
+                        }
+                        else
+                        {
+                            _input[_input[_index + 3]] = 0;
+                        }
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    _index += instr.HasTwoValues ? 4 : 2;
+                }
+
+                //return Output;
+            }
         }
 
         public static int LoopUntilHaltDay7(List<int> input, int inputFor3, int secondInputFor3)
@@ -195,6 +395,12 @@ namespace AoC2019
                                  C <= 4 &&
                                  D <= 4 &&
                                  E <= 4;
+
+        public bool BetweenFiveAndNine => A >= 5 && A <= 9 &&
+                                          B >= 5 && B <= 9 &&
+                                          C >= 5 && C <= 9 &&
+                                          D >= 5 && D <= 9 &&
+                                          E >= 5 && E <= 9;
 
         public bool IsDifferent => B != A &&
                                    C != A && C != B && 
