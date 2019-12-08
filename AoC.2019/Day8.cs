@@ -17,6 +17,7 @@ namespace AoC2019
         public override void PartOne()
         {
             base.PartOne();
+            return;
             var input = Inputs.Day8;
             //input = "123456789012";
 
@@ -42,7 +43,7 @@ namespace AoC2019
         {
             base.PartTwo();
             var input = Inputs.Day8;
-            input = "0222112222120000";
+            //input = "0222112222120000";
 
             var layers = new List<ImageLayers>();
 
@@ -56,10 +57,31 @@ namespace AoC2019
                 skip += take;
             }
 
-            var fewest = layers.Select(s => s.Layer).OrderBy(o => ImageLayers.CountDigit(o, '0')).ToList();
-            var first = fewest.First();
-            var result = ImageLayers.CountDigit(first, '1') * ImageLayers.CountDigit(first, '2');
-            Console.WriteLine(result);
+            var currentPos = 0;
+            for (int y = 0; y < ImageLayers.Height; y++)
+            {
+                for (int x = 0; x < ImageLayers.Width; x++)
+                {
+                    foreach (var imageLayer in layers)
+                    {
+                        var pixel = imageLayer.AsString[currentPos];
+                        if (pixel == '0')
+                        {
+                            Console.Write('#');
+                            break;
+                        }
+                        else if (pixel == '1')
+                        {
+                            Console.Write('|');
+                            break;
+                        }
+                    }
+
+                    currentPos += 1;
+                }
+                Console.WriteLine();
+            }
+
             Console.WriteLine();
         }
     }
@@ -71,9 +93,12 @@ namespace AoC2019
         public static int Total = Width * Height;
 
         public List<char[]> Layers = new List<char[]>(6);
+        public string AsString;
 
         public ImageLayers(char[] layerData)
         {
+            AsString = string.Join("", layerData);
+
             var skip = 0;
             for (int i = 0; i < Height; i++)
             {
