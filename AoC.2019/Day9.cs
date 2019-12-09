@@ -16,15 +16,15 @@ namespace AoC2019
         public override void PartOne()
         {
             base.PartOne();
-            var input = Inputs.Day9.SplitAsLongsBy(',');
+            var input = Inputs.Day9.SplitAsLongsBy(',').ToArray();
             //input = @"109,19,204,-34".SplitAsLongsBy(',');
-            var newList = new List<long>(100000);
-            newList.AddRange(input);
+            var newList = new long[100000];
+            input.CopyTo(newList,0);
 
-            for (int i = 0; i < 100000; i++)
-            {
-                newList.Add(0);
-            }
+            //for (int i = 0; i < 100000; i++)
+            //{
+            //    newList.Add(0);
+            //}
 
             LoopUntilHaltDay9(newList);
 
@@ -37,40 +37,40 @@ namespace AoC2019
             Console.WriteLine();
         }
 
-        public static void LoopUntilHaltDay9(List<long> input)
+        public static void LoopUntilHaltDay9(long[] input)
         {
-            int index = 0;
+            long index = 0;
             IntCodeInstruction2 instr = null;
             long relativeModeVal = 0;
 
-            long GetValue1(IntCodeInstruction2 i)
+            long GetPointer1(IntCodeInstruction2 i)
             {
                 if (i.ModeValue1 == IntCodeMode.Imidiate)
-                    return input[index + 1];
+                    return index + 1;
                 if (i.ModeValue1 == IntCodeMode.Relative)
-                    return input[(int)(relativeModeVal + input[index + 1])];
+                    return relativeModeVal + input[index + 1];
                 
-                return input[(int)input[index + 1]];
+                return input[index + 1];
             }
 
-            long GetValue2(IntCodeInstruction2 i)
+            long GetPointer2(IntCodeInstruction2 i)
             {
                 if (i.ModeValue2 == IntCodeMode.Imidiate)
-                    return input[index + 2];
+                    return index + 2;
                 if (i.ModeValue2 == IntCodeMode.Relative)
-                    return input[(int)(relativeModeVal + input[index + 2])];
+                    return relativeModeVal + input[index + 2];
 
-                return input[(int)input[index + 2]];
+                return input[index + 2];
             }
 
-            long GetValue3(IntCodeInstruction2 i)
+            long GetPointer3(IntCodeInstruction2 i)
             {
-                if (i.ModeValue2 == IntCodeMode.Imidiate)
-                    return input[index + 3];
-                if (i.ModeValue2 == IntCodeMode.Relative)
-                    return input[(int)(relativeModeVal + input[index + 3])];
+                if (i.ModeValue3 == IntCodeMode.Imidiate)
+                    return index + 3;
+                if (i.ModeValue3 == IntCodeMode.Relative)
+                    return relativeModeVal + input[index + 3];
 
-                return input[(int)input[index + 3]];
+                return input[index + 3];
             }
 
             while (instr == null || instr.OpCode != 99)
@@ -81,38 +81,33 @@ namespace AoC2019
                     break;
                 }
 
-                var value1 = GetValue1(instr);
-
                 if (instr.OpCode == 1)
                 {
-                    input[(int)GetValue3(instr)] = value1 + GetValue2(instr);
+                    input[GetPointer3(instr)] = input[GetPointer1(instr)] + input[GetPointer2(instr)];
                 }
                 else if (instr.OpCode == 2)
                 {
-                    input[(int)GetValue3(instr)] = value1 * GetValue2(instr);
+                    input[GetPointer3(instr)] = input[GetPointer1(instr)] * input[GetPointer2(instr)];
                 }
                 else if (instr.OpCode == 3)
                 {
-                    value1 = GetValue1(instr);
-                    input[(int)value1] = 1; // INPUT
+                    input[GetPointer1(instr)] = 1; // INPUT
                 }
                 else if (instr.OpCode == 4)
                 {
-                    value1 = GetValue1(instr);
-                    Console.WriteLine(value1);
+                    Console.WriteLine(input[GetPointer1(instr)]);
                 }
                 else if (instr.OpCode == 9)
                 {
                     //Opcode 9 adjusts the relative base by the value of its only parameter. The relative base increases (or decreases, if the value is negative) by the value of the parameter.
-                    value1 = input[index + 1];
-                    relativeModeVal += value1;
+                    relativeModeVal += input[GetPointer1(instr)];
                 }
                 else if (instr.OpCode == 5)
                 {
                     //Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-                    if (value1 != 0)
+                    if (input[GetPointer1(instr)] != 0)
                     {
-                        index = (int)GetValue2(instr);
+                        index = input[GetPointer2(instr)];
                     }
                     else
                     {
@@ -124,9 +119,9 @@ namespace AoC2019
                 else if (instr.OpCode == 6)
                 {
                     //Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
-                    if (value1 == 0)
+                    if (input[GetPointer1(instr)] == 0)
                     {
-                        index = (int)GetValue2(instr);
+                        index = input[GetPointer2(instr)];
                     }
                     else
                     {
@@ -137,28 +132,28 @@ namespace AoC2019
                 }
                 else if (instr.OpCode == 7)
                 {
-                    var storageIndex = GetValue3(instr);
+                    var storageIndex = GetPointer3(instr);
                     //Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-                    if (value1 < GetValue2(instr))
+                    if (input[GetPointer1(instr)] < input[GetPointer2(instr)])
                     {
-                        input[(int)storageIndex] = 1;
+                        input[storageIndex] = 1;
                     }
                     else
                     {
-                        input[(int)storageIndex] = 0;
+                        input[storageIndex] = 0;
                     }
                 }
                 else if (instr.OpCode == 8)
                 {
-                    var storageIndex = GetValue3(instr);
+                    var storageIndex = GetPointer3(instr);
                     //Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
-                    if (value1 == GetValue2(instr))
+                    if (input[GetPointer1(instr)] == input[GetPointer2(instr)])
                     {
-                        input[(int)storageIndex] = 1;
+                        input[storageIndex] = 1;
                     }
                     else
                     {
-                        input[(int)storageIndex] = 0;
+                        input[storageIndex] = 0;
                     }
                 }
                 else
@@ -234,5 +229,4 @@ namespace AoC2019
         Imidiate,
         Relative
     }
-
 }
