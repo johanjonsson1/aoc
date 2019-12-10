@@ -61,8 +61,30 @@ namespace AoC.Common
             double deltaX = (X - other.X);
             double result = Math.Atan2(deltaY, deltaX);
 
-            return Math.Round((result * (180 / Math.PI)), 2);
-            // (result < 0) ? (360d + result) : result;
+            result = Math.Round((result * (180 / Math.PI)), 2);
+
+            if (result < 0)
+            {
+                result = 360d + result;
+            }
+
+            return result;
+        }
+
+        public double GetAngle90DegreesOffset(Coordinate other)
+        {
+            double deltaY = (Y - other.Y);
+            double deltaX = (X - other.X);
+            double result = Math.Atan2(deltaY, deltaX);
+
+            result = Math.Round((result * (180 / Math.PI)), 2);
+
+            if (result < 90)
+            {
+                result = 360d + result;
+            }
+
+            return result;
         }
     }
 }
