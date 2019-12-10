@@ -54,5 +54,15 @@ namespace AoC.Common
         {
             return Math.Abs(X - other.X) + Math.Abs(Y - other.Y);
         }
+
+        public double GetAngle(Coordinate other)
+        {
+            double deltaY = (Y - other.Y);
+            double deltaX = (X - other.X);
+            double result = Math.Atan2(deltaY, deltaX);
+
+            return Math.Round((result * (180 / Math.PI)), 2);
+            // (result < 0) ? (360d + result) : result;
+        }
     }
 }
