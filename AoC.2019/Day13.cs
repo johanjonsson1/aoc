@@ -55,10 +55,8 @@ namespace AoC2019
         public override void PartOne()
         {
             base.PartOne();
-            var input = Inputs.Day13.SplitAsLongsBy(',').ToArray();
-            var newList = new long[100000];
-            input.CopyTo(newList, 0);
-            var intCodeMachine = new IntCodeProgram(newList);
+            var input = Inputs.Day13.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
+            var intCodeMachine = new IntCodeProgram(input);
             var list = new List<Tile>();
 
             while (!intCodeMachine.IsTerminated)
@@ -82,11 +80,9 @@ namespace AoC2019
         public override void PartTwo()
         {
             base.PartTwo();
-            var input = Inputs.Day13.SplitAsLongsBy(',').ToArray();
-            var newList = new long[100000];
-            input.CopyTo(newList, 0);
-            newList[0] = 2;
-            var intCodeMachine = new IntCodeProgram(newList);
+            var input = Inputs.Day13.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
+            input[0] = 2;
+            var intCodeMachine = new IntCodeProgram(input);
             var list = new List<Tile>();
 
             var ballMove = 0;

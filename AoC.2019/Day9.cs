@@ -77,22 +77,18 @@ namespace AoC2019
         {
             base.PartOne();
             _input = 1;
-            var input = Inputs.Day9.SplitAsLongsBy(',').ToArray();
+            var input = Inputs.Day9.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
             //input = @"109,19,204,-34".SplitAsLongsBy(',');
-            var newList = new long[100000];
-            input.CopyTo(newList, 0);
-            LoopUntilHaltDay9(newList);
+            LoopUntilHaltDay9(input);
         }
 
         public override void PartTwo()
         {
             base.PartTwo();
             _input = 2;
-            var input = Inputs.Day9.SplitAsLongsBy(',').ToArray();
+            var input = Inputs.Day9.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
             //input = @"109,19,204,-34".SplitAsLongsBy(',');
-            var newList = new long[100000];
-            input.CopyTo(newList, 0);
-            LoopUntilHaltDay9(newList);
+            LoopUntilHaltDay9(input);
         }
 
         public static void LoopUntilHaltDay9(long[] input)

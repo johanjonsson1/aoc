@@ -100,5 +100,13 @@ namespace AoC.Common
         {
             return input[0];
         }
+
+        public static long[] ExpandTo(this long[] array, int expandTo)
+        {
+            var @new = new long[100000];
+            array.CopyTo(@new, 0);
+
+            return @new;
+        }
     }
 }
