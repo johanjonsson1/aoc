@@ -17,7 +17,6 @@ namespace AoC2019
 
         public override void PartOne()
         {
-            return;
             base.PartOne();
             var input = Inputs.Day14.ToStringList();
 //            input = @"171 ORE => 8 CNZTR
@@ -40,6 +39,19 @@ namespace AoC2019
             var distinctChemicals = new List<Chemical>();
             CreateChemicals(input, distinctChemicals);
             CreateReactions(input, distinctChemicals);
+            foreach (var distinctChemical in distinctChemicals)
+            {
+                if (distinctChemical.InputReaction == null)
+                {
+                    continue;
+                }
+
+                var firstInputChemical = distinctChemical.InputReaction.Inputs[0];
+                if (firstInputChemical.Chemical.Id == "ORE")
+                {
+                    distinctChemical.GotOre = true;
+                }
+            }
 
             var resultForFuel = distinctChemicals.FirstOrDefault(f => f.Id == "FUEL")?.FindCheapestReactionByOre(1); // 165?
 
@@ -72,7 +84,9 @@ namespace AoC2019
                         reaction.Inputs.Add(inputChemical);
                     }
 
-                    distinctChemical.InputReactions.Add(reaction);
+                    if (distinctChemical.InputReaction != null)
+                        throw new Exception("fail, det kan vara flera?!");
+                    distinctChemical.InputReaction = reaction;
                 }
             }
         }
@@ -98,67 +112,84 @@ namespace AoC2019
         {
             base.PartTwo();
             var input = Inputs.Day14.ToStringList();
-            input = @"171 ORE => 8 CNZTR
-            7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL
-            114 ORE => 4 BHXH
-            14 VRPVC => 6 BMBT
-            6 BHXH, 18 KTJDG, 12 WPTQ, 7 PLWSL, 31 FHTLT, 37 ZDVW => 1 FUEL
-            6 WPTQ, 2 BMBT, 8 ZLQW, 18 KTJDG, 1 XMNCP, 6 MZWV, 1 RJRHP => 6 FHTLT
-            15 XDBXC, 2 LTCX, 1 VRPVC => 6 ZLQW
-            13 WPTQ, 10 LTCX, 3 RJRHP, 14 XMNCP, 2 MZWV, 1 ZLQW => 1 ZDVW
-            5 BMBT => 4 WPTQ
-            189 ORE => 9 KTJDG
-            1 MZWV, 17 XDBXC, 3 XCVML => 2 XMNCP
-            12 VRPVC, 27 CNZTR => 2 XDBXC
-            15 KTJDG, 12 BHXH => 5 XCVML
-            3 BHXH, 2 VRPVC => 7 MZWV
-            121 ORE => 7 VRPVC
-            7 XCVML => 6 RJRHP
-            5 BHXH, 4 VRPVC => 5 LTCX".ToStringList();
+            //input = @"171 ORE => 8 CNZTR
+            //7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL
+            //114 ORE => 4 BHXH
+            //14 VRPVC => 6 BMBT
+            //6 BHXH, 18 KTJDG, 12 WPTQ, 7 PLWSL, 31 FHTLT, 37 ZDVW => 1 FUEL
+            //6 WPTQ, 2 BMBT, 8 ZLQW, 18 KTJDG, 1 XMNCP, 6 MZWV, 1 RJRHP => 6 FHTLT
+            //15 XDBXC, 2 LTCX, 1 VRPVC => 6 ZLQW
+            //13 WPTQ, 10 LTCX, 3 RJRHP, 14 XMNCP, 2 MZWV, 1 ZLQW => 1 ZDVW
+            //5 BMBT => 4 WPTQ
+            //189 ORE => 9 KTJDG
+            //1 MZWV, 17 XDBXC, 3 XCVML => 2 XMNCP
+            //12 VRPVC, 27 CNZTR => 2 XDBXC
+            //15 KTJDG, 12 BHXH => 5 XCVML
+            //3 BHXH, 2 VRPVC => 7 MZWV
+            //121 ORE => 7 VRPVC
+            //7 XCVML => 6 RJRHP
+            //5 BHXH, 4 VRPVC => 5 LTCX".ToStringList();
             var distinctChemicals = new List<Chemical>();
             CreateChemicals(input, distinctChemicals);
             CreateReactions(input, distinctChemicals);
 
-            var ore = 0;
-            var previousOre = 0;
-            var fuel = 10;
-            var increment = 10;
-            var targetOre = 1e12;
+            foreach (var distinctChemical in distinctChemicals)
+            {
+                if (distinctChemical.InputReaction == null)
+                {
+                    continue;
+                }
+
+                var firstInputChemical = distinctChemical.InputReaction.Inputs[0];
+                if (firstInputChemical.Chemical.Id == "ORE")
+                {
+                    distinctChemical.GotOre = true;
+                }
+            }
+            
+            long maxOre = 1_000_000_000_000;
+            long lastOre = 0;
+            long fuelRequest = 1_000_000;
+            long increment = 1_000_000;
             var chemical = distinctChemicals.First(f => f.Id == "FUEL");
+
             while (true)
             {
-                previousOre = ore;
-                ore = chemical.FindCheapestReactionByOre(fuel);
+                distinctChemicals.ForEach(f => f.Wasted = 0);
+                var currentOre = chemical.FindCheapestReactionByOre(fuelRequest);
 
-                if (previousOre >= targetOre && ore <= targetOre && increment == 1)
+                if (lastOre >= maxOre && currentOre <= maxOre && increment == 1)
                 {
                     break;
                 }
 
-                if (ore < targetOre)
+                if (currentOre < maxOre)
                 {
-                    if (ore - previousOre > previousOre)
+                    if (currentOre - lastOre > lastOre)
                     {
                         increment *= 2;
                     }
-                    fuel += increment;
+                    fuelRequest += increment;
                 }
                 else
                 {
-                    increment = (int)Math.Ceiling((decimal)increment / 2);
-                    fuel -= increment;
+                    increment = (int)Math.Ceiling((double)increment / 2);
+                    fuelRequest -= increment;
                 }
+
+                lastOre = currentOre;
             }
 
-            Console.WriteLine(fuel);
+            Console.WriteLine(fuelRequest);
         }
     }
 
     public class Chemical
     {
-        public string Id { get; }
-        public List<InputReaction> InputReactions { get; } = new List<InputReaction>();
-        public int Wasted;
+        public string Id;
+        public InputReaction InputReaction;
+        public long Wasted;
+        public bool GotOre = false;
 
         public Chemical(string id)
         {
@@ -167,10 +198,10 @@ namespace AoC2019
 
         public void AddReactionProducingChemical(InputReaction reaction)
         {
-            InputReactions.Add(reaction);
+            InputReaction = reaction;
         }
 
-        public int FindCheapestReactionByOre(int quantityNeeded)
+        public long FindCheapestReactionByOre(long quantityNeeded)
         {
             if (quantityNeeded - Wasted < 1)
             {
@@ -179,56 +210,60 @@ namespace AoC2019
             }
 
             quantityNeeded -= Wasted;
-
-            var firstReaction = InputReactions.First();
-            var firstInputChemical = firstReaction.Inputs.First();
-            if (firstInputChemical.Chemical.Id == "ORE")
+            if (GotOre)
             {
-                var ore = firstInputChemical.InputQuantity;
-                var quantityFromOre = firstReaction.OutputQuantity;
+                var firstInputChemical = InputReaction.Inputs[0];
+                var multiplier = (long)Math.Ceiling((double)quantityNeeded / InputReaction.OutputQuantity);
+                var ore = firstInputChemical.InputQuantity * multiplier;
+                var quantityFromOre = InputReaction.OutputQuantity * multiplier;
                 while (quantityFromOre < quantityNeeded)
                 {
                     ore += firstInputChemical.InputQuantity;
-                    quantityFromOre += firstReaction.OutputQuantity;
+                    quantityFromOre += InputReaction.OutputQuantity;
                 }
 
                 Wasted = quantityFromOre - quantityNeeded;
                 return ore;
             }
 
-            var lowestOre = int.MaxValue;
-            var tempWasted = 0;
-            foreach (var ir in InputReactions)
+            //var lowestOre = int.MaxValue;
+            //var tempWasted = 0;
+            //foreach (var ir in InputReactions)
             {
-                var ore = ir.Inputs.Sum(sm => sm.Chemical.FindCheapestReactionByOre(sm.InputQuantity));
-                var quantityFromOre = ir.OutputQuantity;
+                // här kan vi gångra som fan! varje sm
+                // hitta gånger baserat på output
+                // 10 2 => 5 11 
+                var multiplier = (long)Math.Ceiling((double)quantityNeeded / InputReaction.OutputQuantity);
+                var ore = InputReaction.Inputs.Sum(sm => sm.Chemical.FindCheapestReactionByOre(sm.InputQuantity * multiplier));
+                var quantityFromOre = InputReaction.OutputQuantity * multiplier;
 
                 while (quantityFromOre < quantityNeeded)
                 {
-                    ore += ir.Inputs.Sum(sm => sm.Chemical.FindCheapestReactionByOre(sm.InputQuantity));
-                    quantityFromOre += ir.OutputQuantity;
+                    ore += InputReaction.Inputs.Sum(sm => sm.Chemical.FindCheapestReactionByOre(sm.InputQuantity));
+                    quantityFromOre += InputReaction.OutputQuantity;
                 }
 
-                if (ore < lowestOre)
-                {
-                    tempWasted = quantityFromOre - quantityNeeded;
-                    lowestOre = ore;
-                }
+                //if (ore < lowestOre)
+                //{
+                Wasted = quantityFromOre - quantityNeeded;
+                //lowestOre = ore;
+                //}
+
+
+                //Wasted = tempWasted;
+                return ore;
             }
-
-            Wasted = tempWasted;
-            return lowestOre;
         }
 
         public override string ToString()
         {
-            return $"Chemical {Id}, ProducingReactions {InputReactions.Count}";
+            return $"Chemical {Id}, ReactionInputs {InputReaction?.Inputs.Count}";
         }
     }
 
     public class InputReaction
     {
-        public int OutputQuantity { get; set; }
+        public int OutputQuantity;
         public List<InputChemical> Inputs { get; set; } = new List<InputChemical>();
 
         public override string ToString()
@@ -239,8 +274,8 @@ namespace AoC2019
 
     public class InputChemical
     {
-        public int InputQuantity { get; set; }
-        public Chemical Chemical { get; set; }
+        public int InputQuantity;
+        public Chemical Chemical;
 
         public override string ToString()
         {
