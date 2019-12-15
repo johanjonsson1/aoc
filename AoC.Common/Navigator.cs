@@ -84,6 +84,23 @@ namespace AoC.Common
             }
         }
 
+        public Coordinate PeekMove(int distance)
+        {
+            switch (Facing)
+            {
+                case Face.Up:
+                    return new Coordinate(CurrentCoordinate.X, CurrentCoordinate.Y - distance);
+                case Face.Down:
+                    return new Coordinate(CurrentCoordinate.X, CurrentCoordinate.Y + distance);
+                case Face.Right:
+                    return new Coordinate(CurrentCoordinate.X + distance, CurrentCoordinate.Y);
+                case Face.Left:
+                    return new Coordinate(CurrentCoordinate.X - distance, CurrentCoordinate.Y);
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
         public void Move(int distance)
         {
             var oldPos = CurrentCoordinate;
