@@ -86,5 +86,37 @@ namespace AoC.Common
 
             return result;
         }
+
+        public bool IsAdjacent(Coordinate other)
+        {
+            var x = this.X;
+            var y = this.Y;
+
+            return
+                //(a.Coordinate.X == x - 1 && a.Coordinate.Y == y - 1) ||
+                (other.X == x && other.Y == y - 1) ||
+                //(a.Coordinate.X == x + 1 && a.Coordinate.Y == y - 1) ||
+                (other.X == x + 1 && other.Y == y) ||
+                (other.X == x - 1 && other.Y == y) ||
+                //(a.Coordinate.X == x - 1 && a.Coordinate.Y == y + 1) ||
+                (other.X == x && other.Y == y + 1); // ||
+            //(a.Coordinate.X == x + 1 && a.Coordinate.Y == y + 1))
+        }
+
+        public bool IsAdjacentPlusDiag(Coordinate other)
+        {
+            var x = this.X;
+            var y = this.Y;
+
+            return
+                (other.X == x - 1 && other.Y == y - 1) ||
+                (other.X == x && other.Y == y - 1) ||
+                (other.X == x + 1 && other.Y == y - 1) ||
+                (other.X == x + 1 && other.Y == y) ||
+                (other.X == x - 1 && other.Y == y) ||
+                (other.X == x - 1 && other.Y == y + 1) ||
+                (other.X == x && other.Y == y + 1) ||
+                (other.X == x + 1 && other.Y == y + 1);
+        }
     }
 }

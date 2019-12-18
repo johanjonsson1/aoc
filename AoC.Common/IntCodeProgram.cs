@@ -14,6 +14,7 @@ namespace AoC.Common
         public long Output = -1;
         private bool OneInputUsed;
         long _relativeModeVal = 0;
+        private Queue<long> _inputsQueue = new Queue<long>();
 
         public IntCodeProgram(int amplifier, long[] inputs)
         {
@@ -25,6 +26,11 @@ namespace AoC.Common
         {
             _input = inputs;
             OneInputUsed = true;
+        }
+
+        public void AddInput(long input)
+        {
+            _inputsQueue.Enqueue(input);
         }
 
         public void LoopUntilHalt(long input)
@@ -51,7 +57,11 @@ namespace AoC.Common
                 }
                 else if (instr.OpCode == 3)
                 {
-                    if (OneInputUsed)
+                    if (_inputsQueue.Count > 0)
+                    {
+                        _input[GetPointer1(instr)] = _inputsQueue.Dequeue();
+                    }
+                    else if (OneInputUsed)
                     {
                         _input[GetPointer1(instr)] = input; // INPUT
                     }

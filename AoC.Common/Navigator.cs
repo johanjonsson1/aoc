@@ -63,6 +63,12 @@ namespace AoC.Common
             }
         }
 
+        public void TeleportTo(Coordinate coordinate)
+        {
+            CurrentCoordinate = coordinate;
+            VisitedCoordinates.Add(coordinate);
+        }
+
         public void TurnAround()
         {
             switch (Facing)
