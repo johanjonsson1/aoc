@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using AoC.Common;
 using static AoC.Common.SantaHelper;
 
@@ -228,43 +231,43 @@ namespace AoC2019
         {
             base.PartTwo();
             var input = Inputs.Day20.ToStringList();
-            input = @"             Z L X W       C                 
-             Z P Q B       K                 
-  ###########.#.#.#.#######.###############  
-  #...#.......#.#.......#.#.......#.#.#...#  
-  ###.#.#.#.#.#.#.#.###.#.#.#######.#.#.###  
-  #.#...#.#.#...#.#.#...#...#...#.#.......#  
-  #.###.#######.###.###.#.###.###.#.#######  
-  #...#.......#.#...#...#.............#...#  
-  #.#########.#######.#.#######.#######.###  
-  #...#.#    F       R I       Z    #.#.#.#  
-  #.###.#    D       E C       H    #.#.#.#  
-  #.#...#                           #...#.#  
-  #.###.#                           #.###.#  
-  #.#....OA                       WB..#.#..ZH
-  #.###.#                           #.#.#.#  
-CJ......#                           #.....#  
-  #######                           #######  
-  #.#....CK                         #......IC
-  #.###.#                           #.###.#  
-  #.....#                           #...#.#  
-  ###.###                           #.#.#.#  
-XF....#.#                         RF..#.#.#  
-  #####.#                           #######  
-  #......CJ                       NM..#...#  
-  ###.#.#                           #.###.#  
-RE....#.#                           #......RF
-  ###.###        X   X       L      #.#.#.#  
-  #.....#        F   Q       P      #.#.#.#  
-  ###.###########.###.#######.#########.###  
-  #.....#...#.....#.......#...#.....#.#...#  
-  #####.#.###.#######.#######.###.###.#.#.#  
-  #.......#.......#.#.#.#.#...#...#...#.#.#  
-  #####.###.#####.#.#.#.#.###.###.#.###.###  
-  #.......#.....#.#...#...............#...#  
-  #############.#.#.###.###################  
-               A O F   N                     
-               A A D   M                     ".ToStringList();
+//            input = @"             Z L X W       C                 
+//             Z P Q B       K                 
+//  ###########.#.#.#.#######.###############  
+//  #...#.......#.#.......#.#.......#.#.#...#  
+//  ###.#.#.#.#.#.#.#.###.#.#.#######.#.#.###  
+//  #.#...#.#.#...#.#.#...#...#...#.#.......#  
+//  #.###.#######.###.###.#.###.###.#.#######  
+//  #...#.......#.#...#...#.............#...#  
+//  #.#########.#######.#.#######.#######.###  
+//  #...#.#    F       R I       Z    #.#.#.#  
+//  #.###.#    D       E C       H    #.#.#.#  
+//  #.#...#                           #...#.#  
+//  #.###.#                           #.###.#  
+//  #.#....OA                       WB..#.#..ZH
+//  #.###.#                           #.#.#.#  
+//CJ......#                           #.....#  
+//  #######                           #######  
+//  #.#....CK                         #......IC
+//  #.###.#                           #.###.#  
+//  #.....#                           #...#.#  
+//  ###.###                           #.#.#.#  
+//XF....#.#                         RF..#.#.#  
+//  #####.#                           #######  
+//  #......CJ                       NM..#...#  
+//  ###.#.#                           #.###.#  
+//RE....#.#                           #......RF
+//  ###.###        X   X       L      #.#.#.#  
+//  #.....#        F   Q       P      #.#.#.#  
+//  ###.###########.###.#######.#########.###  
+//  #.....#...#.....#.......#...#.....#.#...#  
+//  #####.#.###.#######.#######.###.###.#.#.#  
+//  #.......#.......#.#.#.#.#...#...#...#.#.#  
+//  #####.###.#####.#.#.#.#.###.###.#.###.###  
+//  #.......#.....#.#...#...............#...#  
+//  #############.#.#.###.###################  
+//               A O F   N                     
+//               A A D   M                     ".ToStringList();
 
             var grid = CreateGrid(input);
             all = grid.GetAll();
@@ -363,12 +366,22 @@ RE....#.#                           #......RF
             var startPortal = portals.First(f => f.Name == "AA");
             var targetPortal = portals.First(f => f.Name == "ZZ"); 
             SetInner(portals);
-            //SetLevel(new List<Portal> {startPortal, targetPortal}, 0, portals);
 
-            var ls = int.MaxValue;
-            ClosestByLevel(startPortal, targetPortal, startPortal, new List<string>() { startPortal.GetLevelKey(0) }, 0, 0, ref ls);
+            var f1 = new QueueItem
+            {
+                From = startPortal,
+                Coordinate = startPortal.Coordinate,
+                Count = 0,
+                Level = 0,
+                Steps = "AA0"
+            };
 
-            Console.WriteLine("this " + ls);
+            ClosestByLevelQueue(f1, targetPortal.Coordinate);
+
+            //var ls = int.MaxValue;
+            //ClosestByLevel(startPortal, targetPortal, startPortal, new List<string>() { startPortal.GetLevelKey(0) }, 0, 0, ref ls);
+
+            Console.WriteLine("this " + lowestSteps);
         }
 
         private void SetInner(List<Portal> portals)
@@ -383,33 +396,7 @@ RE....#.#                           #......RF
                     continue;
                 }
 
-                //if (portal.Coordinate.Y >= 26 && portal.Coordinate.Y <= 82 && portal.Coordinate.X >= 26 &&
-                //    portal.Coordinate.X <= 80)
-                //{
-                //    portal.Inner = true;
-                //}
-
                 portal.Inner = true;
-
-                //    y 27   81
-                //x 27   78
-            }
-        }
-
-        private void SetLevel(List<Portal> portals, int level, List<Portal> all)
-        {
-            portals.ForEach(f =>
-            {
-                f.Level = level;
-                f.ConnectedTo.Where(x => x.Portal.Inner).ToList().ForEach(f1 => f1.Portal.Level = level);
-            });
-
-            foreach (var portal in all)
-            {
-                if (portal.Level == -1)
-                {
-                    portal.Level = 1;
-                }
             }
         }
 
@@ -480,6 +467,120 @@ RE....#.#                           #......RF
             "FD0"
         };
 
+        public int lowestSteps = int.MaxValue;
+        public int started = 0;
+        public object locker = new object();
+
+        public IEnumerable<bool> QueueGet()
+        {
+            if (started < 8)
+            {
+                yield return true;
+            }
+        }
+
+        private void
+            ClosestByLevelQueue(QueueItem first, Coordinate to)
+        {
+            var queue = new Queue<QueueItem>();
+            queue.Enqueue(first);
+
+            var visited = new List<Tuple<Coordinate, int>>();
+            //visited.Add(new Tuple<Coordinate, int>(first.Coordinate, first.Level));
+
+            while (queue.Count > 0)
+            {
+                var qi = queue.Dequeue();
+
+                if (qi.Count > lowestSteps || qi.Level < 0 || qi.Level > 45 || qi.Count > 8500)
+                {
+                    continue;
+                }
+
+                bool OnlyInner(Portal p)
+                {
+                    if (p.GetLevel(qi.Level, qi.From) > 0 || (p.Inner || p.Name == "ZZ"))
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                if (qi.Coordinate.Equals(to) && qi.Level == 0)
+                {
+                    lowestSteps = qi.Count;
+                    Console.WriteLine(qi.Steps);
+                    break;
+                }
+
+                if (visited.Any(a => a.Item1.Equals(qi.Coordinate) && a.Item2 == qi.Level))
+                {
+                    continue;
+                }
+
+                visited.Add(new Tuple<Coordinate, int>(qi.Coordinate, qi.Level));
+                //Console.WriteLine(qi.From.Name + ", dist ("+qi.Count+"), lvl ("+qi.Level+")");
+
+                var visitablePortals = qi.From.ConnectedTo.Where(c => OnlyInner(c.Portal) && c.Portal != qi.From.Exit).ToList();
+
+                foreach (var pD in visitablePortals)
+                {
+                    var llevel = pD.Portal.Inner ? qi.Level + 1 : qi.Level - 1;
+                    var steps = qi.Steps;
+
+                    if (qi.Level == 0 && pD.Portal.Name == "ZZ")
+                    {
+                        steps += "," + pD.Portal.Name + llevel;
+                        queue.Enqueue(new QueueItem
+                        {
+                            From = pD.Portal,
+                            Coordinate = pD.Portal.Coordinate,
+                            Count = qi.Count + pD.Distance,
+                            Level = qi.Level,
+                            Steps = steps
+                        });
+                        continue;
+                    }
+
+                    if (pD.Portal.Exit == null)
+                    {
+                        continue;
+                    }
+
+                    steps += "," + pD.Portal.Name + llevel;
+                    queue.Enqueue(new QueueItem
+                    {
+                        From = pD.Portal.Exit,
+                        Coordinate = pD.Portal.Exit.Coordinate,
+                        Count = qi.Count + pD.Distance + 1,
+                        Level = llevel,
+                        Steps = steps
+                    });
+                    //var level2 = qi.Level;
+
+                    //queue.Enqueue(new QueueItem
+                    //{
+                    //    From = pD.Portal, Coordinate = pD.Portal.Coordinate, Count = count + pD.Distance, Level = level2
+                    //});
+                    //ClosestByLevel(pD.Portal, to, from, visited2, count + pD.Distance, llevel, ref lowestSteps);
+                }
+
+                //if (from.Exit != null)
+                //{
+                //    var llevel = qi.From.Inner ? qi.Level + 1 : qi.Level - 1;
+                //    queue.Enqueue(new QueueItem
+                //    {
+                //        From = from.Exit,
+                //        Coordinate = from.Exit.Coordinate,
+                //        Count = count + 1,
+                //        Level = llevel
+                //    });
+                //}
+            }
+        }
+
+
         private void
             ClosestByLevel(Portal from, Portal to, Portal last, List<string> visited, int count, int level, ref int lowestSteps)
         {
@@ -499,88 +600,13 @@ RE....#.#                           #......RF
                 return false;
             };
 
-            //bool AnotherWayLastTime(Portal p)
-            //{
-            //    var key = p.GetLevelKey(level, from);
-            //    var i = visited.IndexOf(key);
-
-            //    if (i == 0)
-            //    {
-            //        return true;
-            //    }
-
-            //    if (p.Name == from.Name && !visited[i - 1].StartsWith(p.Name))
-            //    {
-            //        return true;
-            //    }
-                
-            //    if (p.Name != from.Name && visited[i-1].StartsWith(p.Name))
-            //    {
-            //        return true;
-            //    }
-
-            //    return false;
-            //};
-
-            //if (test.Count == visited.Count && !test.Except(visited).Any())
-            //{
-
-            //}
-
             var visitablePortals = from.ConnectedTo.Where(c => !ReferenceEquals(c.Portal, last) &&
-                                                               //(object.ReferenceEquals(from.Exit, c.Portal) ||
-                                                               //(visited.All(
-                                                               //     a => a != c.Portal.GetLevelKey(level, @from)) ||
-                                                               // AnotherWayLastTime(c.Portal)) &&
-                                                               OnlyInner(c.Portal)
-            ).Reverse().ToList();
-
-            //var compoundKeys = new List<string>();
-
-            //for (var i = 1; i < visited.Count; i++)
-            //{
-            //    var one = visited[i - 1];
-            //    var two = visited[i];
-            //    var id = two.Substring(0, 2);
-
-            //    if (one.StartsWith(id))
-            //    {
-            //        compoundKeys.Add(one + two);
-            //        continue;
-            //    }
-            //}
+                                                               OnlyInner(c.Portal)).Reverse().ToList();
 
             foreach (var pD in visitablePortals)
             {
                 var isTarget = object.ReferenceEquals(pD.Portal, to);
                 var level2 = level;
-                //var compoundKeys2 = new List<string>(compoundKeys);
-                //var from2 = from;
-
-                //if (visited.Contains(pD.Portal.GetLevelKey(level2, from2)))
-                //{
-                //    // doomed
-                //    var cp = pD.Portal.GetCompoundKey(level2, from2);
-                //    var matchingCompounds = compoundKeys2.Where(c => c.StartsWith(pD.Portal.Name)).ToList();
-                //    var doomed = true;
-
-                //    if (matchingCompounds.Any())
-                //    {
-                //        // inte doomed
-                //        if (matchingCompounds.Any(a => a == cp))
-                //        {
-                //            // doomed
-                //            continue;
-                //        }
-
-                //        doomed = false;
-                //    }
-
-                //    if (doomed)
-                //    {
-                //        continue;
-                //    }
-                //}
 
                 if (isTarget && level2 != 0)
                 {
@@ -590,8 +616,6 @@ RE....#.#                           #......RF
                 if (!isTarget)
                 {
                     var visited2 = new List<string>(visited);
-                    //  0     0     1     1     2
-                    // AA -> UW -> UW -> ND -> ND
                     var sameLevel = from.Name != pD.Portal.Name;
                     var llevel = -1;
                     var key = "";
@@ -617,7 +641,6 @@ RE....#.#                           #......RF
                 else
                 {
                     var visited2 = new List<string>(visited);
-                    //var llevel = pD.Portal.Inner ? level2 + 1 : level2 - 1;
                     visited2.Add(pD.Portal.GetLevelKey(level2));
                     //Console.WriteLine(string.Join(", ", visited2) + " in " + (count + pD.Distance));
                     if (count + pD.Distance < lowestSteps)
@@ -625,8 +648,6 @@ RE....#.#                           #......RF
                         lowestSteps = count + pD.Distance;
                         Console.WriteLine(lowestSteps);
                     }
-
-                    //return;
                 }
             }
         }
@@ -666,6 +687,16 @@ RE....#.#                           #......RF
 
             return grid;
         }
+    }
+
+    public class QueueItem
+    {
+        //Portal from, Portal to, Portal last, List<string> visited, int count, int level
+        public Portal From;
+        public Coordinate Coordinate;
+        public int Count;
+        public int Level;
+        public string Steps;
     }
 
     public class DonutItem
