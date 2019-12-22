@@ -368,7 +368,7 @@ RE....#.#                           #......RF
             var ls = int.MaxValue;
             ClosestByLevel(startPortal, targetPortal, startPortal, new List<string>() { startPortal.GetLevelKey(0) }, 0, 0, ref ls);
 
-            Console.WriteLine(ls);
+            Console.WriteLine("this " + ls);
         }
 
         private void SetInner(List<Portal> portals)
@@ -483,7 +483,7 @@ RE....#.#                           #......RF
         private void
             ClosestByLevel(Portal from, Portal to, Portal last, List<string> visited, int count, int level, ref int lowestSteps)
         {
-            if (count > lowestSteps || level < 0 || level > 30 || count > 500)
+            if (count > lowestSteps || level < 0 || level > 35 || count > 500)
             {
                 return;
             }
@@ -499,28 +499,28 @@ RE....#.#                           #......RF
                 return false;
             };
 
-            bool AnotherWayLastTime(Portal p)
-            {
-                var key = p.GetLevelKey(level, from);
-                var i = visited.IndexOf(key);
+            //bool AnotherWayLastTime(Portal p)
+            //{
+            //    var key = p.GetLevelKey(level, from);
+            //    var i = visited.IndexOf(key);
 
-                if (i == 0)
-                {
-                    return true;
-                }
+            //    if (i == 0)
+            //    {
+            //        return true;
+            //    }
 
-                if (p.Name == from.Name && !visited[i - 1].StartsWith(p.Name))
-                {
-                    return true;
-                }
+            //    if (p.Name == from.Name && !visited[i - 1].StartsWith(p.Name))
+            //    {
+            //        return true;
+            //    }
                 
-                if (p.Name != from.Name && visited[i-1].StartsWith(p.Name))
-                {
-                    return true;
-                }
+            //    if (p.Name != from.Name && visited[i-1].StartsWith(p.Name))
+            //    {
+            //        return true;
+            //    }
 
-                return false;
-            };
+            //    return false;
+            //};
 
             //if (test.Count == visited.Count && !test.Except(visited).Any())
             //{
@@ -529,16 +529,58 @@ RE....#.#                           #......RF
 
             var visitablePortals = from.ConnectedTo.Where(c => !ReferenceEquals(c.Portal, last) &&
                                                                //(object.ReferenceEquals(from.Exit, c.Portal) ||
-                                                               (visited.All(
-                                                                    a => a != c.Portal.GetLevelKey(level, @from)) ||
-                                                                AnotherWayLastTime(c.Portal)) &&
+                                                               //(visited.All(
+                                                               //     a => a != c.Portal.GetLevelKey(level, @from)) ||
+                                                               // AnotherWayLastTime(c.Portal)) &&
                                                                OnlyInner(c.Portal)
-            ).ToList();
-           
+            ).Reverse().ToList();
+
+            //var compoundKeys = new List<string>();
+
+            //for (var i = 1; i < visited.Count; i++)
+            //{
+            //    var one = visited[i - 1];
+            //    var two = visited[i];
+            //    var id = two.Substring(0, 2);
+
+            //    if (one.StartsWith(id))
+            //    {
+            //        compoundKeys.Add(one + two);
+            //        continue;
+            //    }
+            //}
+
             foreach (var pD in visitablePortals)
             {
                 var isTarget = object.ReferenceEquals(pD.Portal, to);
                 var level2 = level;
+                //var compoundKeys2 = new List<string>(compoundKeys);
+                //var from2 = from;
+
+                //if (visited.Contains(pD.Portal.GetLevelKey(level2, from2)))
+                //{
+                //    // doomed
+                //    var cp = pD.Portal.GetCompoundKey(level2, from2);
+                //    var matchingCompounds = compoundKeys2.Where(c => c.StartsWith(pD.Portal.Name)).ToList();
+                //    var doomed = true;
+
+                //    if (matchingCompounds.Any())
+                //    {
+                //        // inte doomed
+                //        if (matchingCompounds.Any(a => a == cp))
+                //        {
+                //            // doomed
+                //            continue;
+                //        }
+
+                //        doomed = false;
+                //    }
+
+                //    if (doomed)
+                //    {
+                //        continue;
+                //    }
+                //}
 
                 if (isTarget && level2 != 0)
                 {
@@ -552,17 +594,24 @@ RE....#.#                           #......RF
                     // AA -> UW -> UW -> ND -> ND
                     var sameLevel = from.Name != pD.Portal.Name;
                     var llevel = -1;
+                    var key = "";
                     if (sameLevel)
                     {
                         llevel = level2;
-                        visited2.Add(pD.Portal.GetLevelKey(level2));
+                        key = pD.Portal.GetLevelKey(level2);
                     }
                     else
                     {
                         llevel = from.Inner ? level2 + 1 : level2 - 1;
-                        //var inOut = from.Inner ? 'D' : 'U';
-                        visited2.Add(pD.Portal.GetLevelKey(llevel));// + inOut);
+                        key = pD.Portal.GetLevelKey(llevel);
                     }
+                    visited2.Add(key);
+
+                    if (visited2.Count(s => s == key) > 2)
+                    {
+                        continue;
+                    }
+
                     ClosestByLevel(pD.Portal, to, from, visited2, count + pD.Distance, llevel, ref lowestSteps);
                 }
                 else
@@ -570,10 +619,11 @@ RE....#.#                           #......RF
                     var visited2 = new List<string>(visited);
                     //var llevel = pD.Portal.Inner ? level2 + 1 : level2 - 1;
                     visited2.Add(pD.Portal.GetLevelKey(level2));
-                    Console.WriteLine(string.Join(", ", visited2) + " in " + (count + pD.Distance));
+                    //Console.WriteLine(string.Join(", ", visited2) + " in " + (count + pD.Distance));
                     if (count + pD.Distance < lowestSteps)
                     {
                         lowestSteps = count + pD.Distance;
+                        Console.WriteLine(lowestSteps);
                     }
 
                     //return;
@@ -664,6 +714,28 @@ RE....#.#                           #......RF
         public string GetLevelKey(int level)
         {
             return Name + level;
+        }
+
+        public string GetCompoundKey(int level, Portal from)
+        {
+            if (Name == "ZZ" || Name == "AA")
+            {
+                return Name + level;
+            }
+
+            var key = GetLevelKey(level, from);
+
+            if (Name == from.Name)
+            {
+                key = Name + level + key;
+            }
+
+            if (Name != from.Name)
+            {
+                key = key + Exit.GetLevelKey(level, this);
+            }
+
+            return key;
         }
     }
 
