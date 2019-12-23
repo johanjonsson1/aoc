@@ -23,15 +23,15 @@ namespace AoC2019
         {
             base.PartOne();
             var input = Inputs.Day18.ToStringList();
-            input = @"#################
-#i.G..c...e..H.p#
-########.########
-#j.A..b...f..D.o#
-########@########
-#k.E..a...g..B.n#
-########.########
-#l.F..d...h..C.m#
-#################".ToStringList();
+//            input = @"#################
+//#i.G..c...e..H.p#
+//########.########
+//#j.A..b...f..D.o#
+//########@########
+//#k.E..a...g..B.n#
+//########.########
+//#l.F..d...h..C.m#
+//#################".ToStringList();
 
             Grid = CreateAreas(input, out var start);
             all = Grid.GetAll();
@@ -39,14 +39,26 @@ namespace AoC2019
 
             foreach (var key in keys)
             {
+                Console.WriteLine("Finding distances doors n keys between keys for key "+(char)key.Id);
                 foreach (var otherKey in keys.Where(x => x.Id != key.Id))
                 {
                     var lowestSteps = int.MaxValue;
                     var doors = new List<Door>();
                     var keysBetween = new List<Key>();
-                    FindWithDoorsAndKeys(key.Coordinate, otherKey.Coordinate,
-                        new Coordinate(int.MinValue, int.MinValue), 0,
-                        new List<Door>(), new List<Key>(), ref lowestSteps, ref doors, ref keysBetween);
+
+                    FindWithDoorsAndKeysNoOverflow(new DoorKeysQueueItem
+                    {
+                        From = key.Coordinate,
+                        To = otherKey.Coordinate,
+                        Last = new Coordinate(int.MinValue, int.MinValue),
+                        Count = 0,
+                        DoorsBetween = new List<Door>(),
+                        KeysBetween = new List<Key>()
+                    }, ref lowestSteps, ref doors, ref keysBetween);
+
+                    //FindWithDoorsAndKeys(key.Coordinate, otherKey.Coordinate,
+                    //    new Coordinate(int.MinValue, int.MinValue), 0,
+                    //    new List<Door>(), new List<Key>(), ref lowestSteps, ref doors, ref keysBetween);
 
                     key.Distances.Add(new KeyDistance
                     {
@@ -62,12 +74,24 @@ namespace AoC2019
 
             foreach (var key in keys)
             {
+                Console.WriteLine("Checking if reachable key " + (char)key.Id);
                 var lowestSteps = int.MaxValue;
                 var doors = new List<Door>();
                 var keysBetween = new List<Key>();
-                FindWithDoorsAndKeys(start, key.Coordinate, new Coordinate(int.MinValue, int.MinValue), 0,
-                    new List<Door>(), new List<Key>(),
-                    ref lowestSteps, ref doors, ref keysBetween);
+
+                FindWithDoorsAndKeysNoOverflow(new DoorKeysQueueItem
+                {
+                    From = start,
+                    To = key.Coordinate,
+                    Last = new Coordinate(int.MinValue, int.MinValue),
+                    Count = 0,
+                    DoorsBetween = new List<Door>(),
+                    KeysBetween = new List<Key>()
+                }, ref lowestSteps, ref doors, ref keysBetween);
+
+                //FindWithDoorsAndKeys(start, key.Coordinate, new Coordinate(int.MinValue, int.MinValue), 0,
+                //    new List<Door>(), new List<Key>(),
+                //    ref lowestSteps, ref doors, ref keysBetween);
 
                 if (doors.Count == 0)
                 {
@@ -91,17 +115,42 @@ namespace AoC2019
             //    }
             //});
 
-            foreach (var reachableKey in reachableKeys)
+            GC.Collect();
+
+            //foreach (var reachableKey in reachableKeys)
+            //{
+            //    Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
+            //    FindNewQueue(new AreaQueue
+            //    {
+            //        CollectedKeys = new HashSet<int>(),
+            //        Count = reachableKey.Item2,
+            //        Current = reachableKey.Item1
+            //    });
+            //}
+
+            Parallel.ForEach(reachableKeys, new ParallelOptions { MaxDegreeOfParallelism = 4 },reachableKey =>
             {
+                var lowestSteps = int.MaxValue;
+                Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
                 FindNewQueue(new AreaQueue
                 {
                     CollectedKeys = new HashSet<int>(),
                     Count = reachableKey.Item2,
                     Current = reachableKey.Item1
-                });
-            }
+                }, ref lowestSteps);
 
-            Console.WriteLine(lowestSteps);
+                lock (locker)
+                {
+                    if (lowestSteps < lowestOfTheLow)
+                    {
+                        lowestOfTheLow = lowestSteps;
+                    }
+                }
+
+                GC.Collect();
+            });
+
+            Console.WriteLine("Final: " + lowestOfTheLow); // 7084 too high
         }
 
         private bool Allowed(Area area)
@@ -187,10 +236,10 @@ namespace AoC2019
             public HashSet<int> CollectedKeys;
         }
 
-        public int lowestSteps = int.MaxValue;
+        //public int lowestSteps = int.MaxValue;
 
         private void
-    FindNewQueue(AreaQueue first)
+    FindNewQueue(AreaQueue first, ref int lowestSteps)
         {
             var queue = new Queue<AreaQueue>();
             queue.Enqueue(first);
@@ -240,7 +289,7 @@ namespace AoC2019
                     continue;
                 }
 
-                if (qi.CollectedKeys.Count >= 4)
+                if (qi.CollectedKeys.Count >= 12)
                 {
                     var key = string.Join("", qi.CollectedKeys.OrderBy(o => o));
                     if (visited.TryGetValue(key, out var count))
@@ -274,6 +323,88 @@ namespace AoC2019
                         Current = k.Key,
                         From = qi.Current
                     });
+                }
+            }
+        }
+
+        public class DoorKeysQueueItem
+        {
+            public Coordinate From;
+            public Coordinate To;
+            public Coordinate Last;
+            public int Count;
+            public List<Door> DoorsBetween;
+            public List<Key> KeysBetween;
+
+        }
+
+        private void
+            FindWithDoorsAndKeysNoOverflow(DoorKeysQueueItem first, ref int lowestSteps, ref List<Door> doors,
+                ref List<Key> keys)
+        {
+            var queue = new Queue<DoorKeysQueueItem>();
+            queue.Enqueue(first);
+            var visited = new List<Coordinate>();
+
+            while (queue.Count > 0)
+            {
+                var qi = queue.Dequeue();
+
+                if (qi.Count > lowestSteps)
+                {
+                    continue;
+                }
+
+                if (visited.Any(a => a.Equals(qi.From)))
+                {
+                    continue;
+                }
+                visited.Add(qi.From);
+
+                var visitable = all.Where(g =>
+                    qi.From.IsAdjacent(g.Coordinate) && Allowed(g) && !qi.Last.Equals(g.Coordinate)).ToList();
+
+                foreach (var area in visitable)
+                {
+                    var isTarget = area.Coordinate.Equals(qi.To);
+                    var d = area as Door;
+                    var k = area as Key;
+                    var myDoors = new List<Door>(qi.DoorsBetween);
+                    var myKeys = new List<Key>(qi.KeysBetween);
+
+                    if (d != null)
+                    {
+                        myDoors.Add(d);
+                    }
+
+                    if (!isTarget)
+                    {
+                        if (k != null)
+                        {
+                            myKeys.Add(k);
+                        }
+
+                        queue.Enqueue(new DoorKeysQueueItem
+                        {
+                            From = area.Coordinate,
+                            To = qi.To,
+                            Last = qi.From,
+                            Count = qi.Count + 1,
+                            DoorsBetween = myDoors,
+                            KeysBetween = myKeys
+                        });
+                    }
+                    else
+                    {
+                        if (qi.Count + 1 < lowestSteps)
+                        {
+                            lowestSteps = qi.Count + 1;
+                            doors = myDoors;
+                            keys = myKeys;
+                        }
+
+                        break;
+                    }
                 }
             }
         }
