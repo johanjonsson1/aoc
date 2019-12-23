@@ -11,6 +11,11 @@ namespace AoC.Common
             Items = new List<T>();
         }
 
+        public CircularList(IEnumerable<T> items)
+        {
+            Items = new List<T>(items);
+        }
+
         public CircularList(int capacity = 0)
         {
             Items = new List<T>(capacity);

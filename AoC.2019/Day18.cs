@@ -23,11 +23,15 @@ namespace AoC2019
         {
             base.PartOne();
             var input = Inputs.Day18.ToStringList();
-            input = @"########################
-#...............b.C.D.f#
-#.######################
-#.....@.a.B.c.d.A.e.F.g#
-########################".ToStringList();
+            input = @"#################
+#i.G..c...e..H.p#
+########.########
+#j.A..b...f..D.o#
+########@########
+#k.E..a...g..B.n#
+########.########
+#l.F..d...h..C.m#
+#################".ToStringList();
 
             Grid = CreateAreas(input, out var start);
             all = Grid.GetAll();
@@ -73,21 +77,31 @@ namespace AoC2019
 
             var lowestOfTheLow = int.MaxValue;
 
-            Parallel.ForEach(reachableKeys, reachableKey =>
+            //Parallel.ForEach(reachableKeys, reachableKey =>
+            //{
+            //    var lowestSteps = int.MaxValue;
+            //    NewFind(reachableKey.Item1, 0, new HashSet<int> {reachableKey.Item1.Id}, ref lowestSteps);
+
+            //    lock (locker)
+            //    {
+            //        if (lowestSteps + reachableKey.Item2 < lowestOfTheLow)
+            //        {
+            //            lowestOfTheLow = lowestSteps + reachableKey.Item2;
+            //        }
+            //    }
+            //});
+
+            foreach (var reachableKey in reachableKeys)
             {
-                var lowestSteps = int.MaxValue;
-                NewFind(reachableKey.Item1, 0, new HashSet<int> {reachableKey.Item1.Id}, ref lowestSteps);
-
-                lock (locker)
+                FindNewQueue(new AreaQueue
                 {
-                    if (lowestSteps + reachableKey.Item2 < lowestOfTheLow)
-                    {
-                        lowestOfTheLow = lowestSteps + reachableKey.Item2;
-                    }
-                }
-            });
+                    CollectedKeys = new HashSet<int>(),
+                    Count = reachableKey.Item2,
+                    Current = reachableKey.Item1
+                });
+            }
 
-            Console.WriteLine(lowestOfTheLow);
+            Console.WriteLine(lowestSteps);
         }
 
         private bool Allowed(Area area)
@@ -164,6 +178,106 @@ namespace AoC2019
             base.PartTwo();
             Console.WriteLine();
         }
+
+        public class AreaQueue
+        {
+            public Key From;
+            public Key Current;
+            public int Count;
+            public HashSet<int> CollectedKeys;
+        }
+
+        public int lowestSteps = int.MaxValue;
+
+        private void
+    FindNewQueue(AreaQueue first)
+        {
+            var queue = new Queue<AreaQueue>();
+            queue.Enqueue(first);
+
+            //var visited = new List<Tuple<Coordinate, int>>();
+            //visited.Add(new Tuple<Coordinate, int>(first.Coordinate, first.Level));
+            var visited = new Dictionary<string, int>();
+
+            while (queue.Count > 0)
+            {
+                var qi = queue.Dequeue();
+
+                if (qi.Count > lowestSteps)
+                {
+                    continue;
+                }
+
+                var distances = qi.From?.Distances?.FirstOrDefault(f => f.Key.Id == qi.Current.Id);
+                if (distances != null)
+                {
+                    var doors = distances.DoorsBetween;
+                    if (doors.Except(qi.CollectedKeys).Any())
+                    {
+                        continue;
+                    }
+                    // unlocked
+                }
+
+                qi.CollectedKeys.Add(qi.Current.Id);
+
+                if (distances != null)
+                {
+                    foreach (var ki in distances.KeysBetween)
+                    {
+                        qi.CollectedKeys.Add(ki);
+                    }
+                }
+
+                if (qi.CollectedKeys.Count == keys.Count)
+                {
+                    if (qi.Count < lowestSteps)
+                    {
+                        lowestSteps = qi.Count;
+                        Console.WriteLine(qi.Count);
+                    }
+
+                    continue;
+                }
+
+                if (qi.CollectedKeys.Count >= 4)
+                {
+                    var key = string.Join("", qi.CollectedKeys.OrderBy(o => o));
+                    if (visited.TryGetValue(key, out var count))
+                    {
+                        if (qi.Count >= count)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            visited[key] = qi.Count;
+                        }
+                    }
+                    else
+                    {
+                        visited.Add(key, qi.Count);
+                    }
+                }
+
+                var visitableKeys = qi.Current.Distances.Where(
+                        d => !qi.CollectedKeys.Contains(d.Key.Id))
+                    .ToList();
+
+                foreach (var k in visitableKeys)
+                {
+                    var collected = new HashSet<int>(qi.CollectedKeys);
+                    queue.Enqueue(new AreaQueue
+                    {
+                        CollectedKeys = collected,
+                        Count = qi.Count + k.Distance,
+                        Current = k.Key,
+                        From = qi.Current
+                    });
+                }
+            }
+        }
+
 
         private void
             FindWithDoorsAndKeys(Coordinate from, Coordinate to, Coordinate last, int count,
