@@ -68,6 +68,8 @@ namespace AoC2019
                         Key = otherKey
                     });
                 }
+
+                key.Distances = key.Distances.OrderBy(o => o.Distance).ToList();
             }
 
             var reachableKeys = new List<Tuple<Key, int>>();
@@ -117,38 +119,40 @@ namespace AoC2019
 
             GC.Collect();
 
-            //foreach (var reachableKey in reachableKeys)
-            //{
-            //    Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
-            //    FindNewQueue(new AreaQueue
-            //    {
-            //        CollectedKeys = new HashSet<int>(),
-            //        Count = reachableKey.Item2,
-            //        Current = reachableKey.Item1
-            //    });
-            //}
-
-            Parallel.ForEach(reachableKeys, new ParallelOptions { MaxDegreeOfParallelism = 4 },reachableKey =>
+            foreach (var reachableKey in reachableKeys.OrderBy(o => o.Item2))
             {
-                var lowestSteps = int.MaxValue;
                 Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
                 FindNewQueue(new AreaQueue
                 {
-                    CollectedKeys = new HashSet<int>(),
+                    CollectedKeys = new Dictionary<int, int>(),//new HashSet<int>(),
                     Count = reachableKey.Item2,
                     Current = reachableKey.Item1
-                }, ref lowestSteps);
-
-                lock (locker)
-                {
-                    if (lowestSteps < lowestOfTheLow)
-                    {
-                        lowestOfTheLow = lowestSteps;
-                    }
-                }
+                }, ref lowestOfTheLow);
 
                 GC.Collect();
-            });
+            }
+
+            //Parallel.ForEach(reachableKeys, new ParallelOptions { MaxDegreeOfParallelism = 4 }, reachableKey =>
+            // {
+            //     var lowestSteps = int.MaxValue;
+            //     Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
+            //     FindNewQueue(new AreaQueue
+            //     {
+            //         CollectedKeys = new Dictionary<int, int>(),
+            //         Count = reachableKey.Item2,
+            //         Current = reachableKey.Item1
+            //     }, ref lowestSteps);
+
+            //     lock (locker)
+            //     {
+            //         if (lowestSteps < lowestOfTheLow)
+            //         {
+            //             lowestOfTheLow = lowestSteps;
+            //         }
+            //     }
+
+            //     GC.Collect();
+            // });
 
             Console.WriteLine("Final: " + lowestOfTheLow); // 7084 too high
         }
@@ -233,7 +237,23 @@ namespace AoC2019
             public Key From;
             public Key Current;
             public int Count;
-            public HashSet<int> CollectedKeys;
+            public Dictionary<int,int> CollectedKeys;
+
+            public void Addkey(int key)
+            {
+                if (CollectedKeys.TryGetValue(key, out var visits))
+                {
+                    CollectedKeys[key] += 1;
+                    return;
+                }
+
+                CollectedKeys[key] = 1;
+            }
+
+            public bool KeyVisitedTooManyTimes()
+            {
+                return CollectedKeys.Values.Any(a => a > 5);
+            }
         }
 
         //public int lowestSteps = int.MaxValue;
@@ -246,13 +266,25 @@ namespace AoC2019
 
             //var visited = new List<Tuple<Coordinate, int>>();
             //visited.Add(new Tuple<Coordinate, int>(first.Coordinate, first.Level));
-            var visited = new Dictionary<string, int>();
+            var visited = new Dictionary<int, int>();
+            var counter = 0;
+            var filteredByTimes = 0;
+            var filteredByVisited = 0;
 
             while (queue.Count > 0)
             {
+                counter++;
+
+                if (counter % 300000 == 0)
+                {
+                    Console.WriteLine("q " + queue.Count);
+                    Console.WriteLine("times " + filteredByTimes);
+                    Console.WriteLine("visited " + filteredByVisited);
+                }
+
                 var qi = queue.Dequeue();
 
-                if (qi.Count > lowestSteps)
+                if (qi.Count > lowestSteps || qi.Count > 7084)
                 {
                     continue;
                 }
@@ -261,20 +293,22 @@ namespace AoC2019
                 if (distances != null)
                 {
                     var doors = distances.DoorsBetween;
-                    if (doors.Except(qi.CollectedKeys).Any())
+                    if (doors.Except(qi.CollectedKeys.Keys).Any())
                     {
                         continue;
                     }
                     // unlocked
                 }
 
-                qi.CollectedKeys.Add(qi.Current.Id);
+                qi.Addkey(qi.Current.Id);
+                //qi.CollectedKeys.Add(qi.Current.Id);
 
                 if (distances != null)
                 {
                     foreach (var ki in distances.KeysBetween)
                     {
-                        qi.CollectedKeys.Add(ki);
+                        qi.Addkey(ki);
+                        //qi.CollectedKeys.Add(ki);
                     }
                 }
 
@@ -289,13 +323,21 @@ namespace AoC2019
                     continue;
                 }
 
+                if (qi.KeyVisitedTooManyTimes())
+                {
+                    filteredByTimes++;
+                    continue;
+                }
+
                 if (qi.CollectedKeys.Count >= 12)
                 {
-                    var key = string.Join("", qi.CollectedKeys.OrderBy(o => o));
+                    // annars sortera nycklar efter tagna och om samma nycklar osorterat tagna minus "4" sista sorterat? continue?
+                    var key = string.Join("", qi.CollectedKeys.Keys.OrderBy(o => o)).GetHashCode();
                     if (visited.TryGetValue(key, out var count))
                     {
                         if (qi.Count >= count)
                         {
+                            filteredByVisited++;
                             continue;
                         }
                         else
@@ -310,12 +352,13 @@ namespace AoC2019
                 }
 
                 var visitableKeys = qi.Current.Distances.Where(
-                        d => !qi.CollectedKeys.Contains(d.Key.Id))
+                        d => !qi.CollectedKeys.Keys.Contains(d.Key.Id))
                     .ToList();
 
                 foreach (var k in visitableKeys)
                 {
-                    var collected = new HashSet<int>(qi.CollectedKeys);
+                    //var collected = new HashSet<int>(qi.CollectedKeys);
+                    var collected = new Dictionary<int, int>(qi.CollectedKeys);
                     queue.Enqueue(new AreaQueue
                     {
                         CollectedKeys = collected,

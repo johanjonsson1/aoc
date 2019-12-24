@@ -9,6 +9,7 @@ namespace AoC.Common
         private readonly int _amplifier;
         private long[] _input;
         private bool IsHalted = false;
+        public bool IsHalted2 = false;
         public bool IsTerminated = false;
         private long _index = 0;
         public long Output = -1;
@@ -36,9 +37,11 @@ namespace AoC.Common
         public void LoopUntilHalt(long input)
         {
             IsHalted = false;
+            IsHalted2 = false;
             IntCodeProgramInstruction instr = null;
+            var inputCounter = 0;
 
-            while (!IsHalted && !IsTerminated)
+            while (!IsHalted && !IsTerminated && !IsHalted2)
             {
                 instr = new IntCodeProgramInstruction(_input[_index]);
                 if (instr.OpCode == 99)
@@ -64,6 +67,11 @@ namespace AoC.Common
                     else if (OneInputUsed)
                     {
                         _input[GetPointer1(instr)] = input; // INPUT
+                        inputCounter++;
+                        if (inputCounter > 3)
+                        {
+                            IsHalted2 = true;
+                        }
                     }
                     else
                     {

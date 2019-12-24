@@ -27,7 +27,7 @@ namespace AoC2019
             var bot = new VacuumRobot(input);
 
             bot.ExploreWithIntCode();
-            Print(bot.Grid, bot);
+            Print(bot.Grid, bot.CurrentCoordinate);
             var intersections = bot.Grid.GetAll().Where(x => x.IsIntersection).ToList();
             var result = intersections.Sum(s => s.AlignmentParameter);
 
@@ -137,7 +137,7 @@ namespace AoC2019
             }
         }
 
-        private static void Print(Grid<Coordinate, Space> grid, VacuumRobot bot)
+        public static void Print(Grid<Coordinate, Space> grid, Coordinate bot)
         {
             if (!PrintEnabled)
                 return;
@@ -151,7 +151,7 @@ namespace AoC2019
             {
                 for (var j = 0; j <= maxX; j++)
                 {
-                    if (bot.CurrentCoordinate.X == j && bot.CurrentCoordinate.Y == i)
+                    if (bot.X == j && bot.Y == i)
                     {
                         Console.Write('B');
                         continue;
