@@ -16,6 +16,7 @@ namespace AoC.Common
         private bool OneInputUsed;
         long _relativeModeVal = 0;
         private Queue<long> _inputsQueue = new Queue<long>();
+        public int Iterations;
 
         public IntCodeProgram(int amplifier, long[] inputs)
         {
@@ -43,6 +44,7 @@ namespace AoC.Common
 
             while (!IsHalted && !IsTerminated && !IsHalted2)
             {
+                Iterations++;
                 instr = new IntCodeProgramInstruction(_input[_index]);
                 if (instr.OpCode == 99)
                 {

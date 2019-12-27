@@ -119,7 +119,9 @@ namespace AoC2019
 
             GC.Collect();
 
-            foreach (var reachableKey in reachableKeys.OrderBy(o => o.Item2))
+            var ordered = reachableKeys.OrderBy(o => o.Item2).ToList();
+
+            foreach (var reachableKey in reachableKeys)
             {
                 Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
                 FindNewQueue(new AreaQueue
@@ -154,7 +156,7 @@ namespace AoC2019
             //     GC.Collect();
             // });
 
-            Console.WriteLine("Final: " + lowestOfTheLow); // 7084 too high
+            Console.WriteLine("Final: " + lowestOfTheLow); // 7084 too high -> 7048
         }
 
         private bool Allowed(Area area)
@@ -254,9 +256,16 @@ namespace AoC2019
             {
                 return CollectedKeys.Values.Any(a => a > 5);
             }
+
+            public string GetKey()
+            {
+                var key = string.Join("", CollectedKeys.Keys.OrderBy(o => o));
+                return Current.Id + "_" + key;
+            }
         }
 
         //public int lowestSteps = int.MaxValue;
+        public Dictionary<string, int> visited = new Dictionary<string, int>();
 
         private void
     FindNewQueue(AreaQueue first, ref int lowestSteps)
@@ -266,7 +275,7 @@ namespace AoC2019
 
             //var visited = new List<Tuple<Coordinate, int>>();
             //visited.Add(new Tuple<Coordinate, int>(first.Coordinate, first.Level));
-            var visited = new Dictionary<int, int>();
+            //var visited = new Dictionary<string, int>();
             var counter = 0;
             var filteredByTimes = 0;
             var filteredByVisited = 0;
@@ -323,16 +332,17 @@ namespace AoC2019
                     continue;
                 }
 
-                if (qi.KeyVisitedTooManyTimes())
-                {
-                    filteredByTimes++;
-                    continue;
-                }
+                //if (qi.KeyVisitedTooManyTimes())
+                //{
+                //    filteredByTimes++;
+                //    continue;
+                //}
 
-                if (qi.CollectedKeys.Count >= 12)
+                if (qi.CollectedKeys.Any())
                 {
                     // annars sortera nycklar efter tagna och om samma nycklar osorterat tagna minus "4" sista sorterat? continue?
-                    var key = string.Join("", qi.CollectedKeys.Keys.OrderBy(o => o)).GetHashCode();
+                    //var key = string.Join("", qi.CollectedKeys.Keys.OrderBy(o => o)).GetHashCode();
+                    var key = qi.GetKey();
                     if (visited.TryGetValue(key, out var count))
                     {
                         if (qi.Count >= count)
@@ -357,15 +367,86 @@ namespace AoC2019
 
                 foreach (var k in visitableKeys)
                 {
-                    //var collected = new HashSet<int>(qi.CollectedKeys);
+                    //var newCount = qi.Count + k.Distance;
+                    //if (newCount > lowestSteps || newCount > 7084)
+                    //{
+                    //    continue;
+                    //}
+
                     var collected = new Dictionary<int, int>(qi.CollectedKeys);
-                    queue.Enqueue(new AreaQueue
+                    //var distances = qi.Current?.Distances?.FirstOrDefault(f => f.Key.Id == k.Key.Id);
+                    //if (distances != null)
+                    //{
+                    //    var doors = distances.DoorsBetween;
+                    //    if (doors.Except(collected.Keys).Any())
+                    //    {
+                    //        continue;
+                    //    }
+                    //    // unlocked
+                    //}
+
+                    var queueItem = new AreaQueue
                     {
                         CollectedKeys = collected,
                         Count = qi.Count + k.Distance,
                         Current = k.Key,
                         From = qi.Current
-                    });
+                    };
+
+                    //queueItem.Addkey(queueItem.Current.Id);
+                    ////qi.CollectedKeys.Add(qi.Current.Id);
+
+                    //if (distances != null)
+                    //{
+                    //    foreach (var ki in distances.KeysBetween)
+                    //    {
+                    //        queueItem.Addkey(ki);
+                    //        //qi.CollectedKeys.Add(ki);
+                    //    }
+                    //}
+
+                    //if (queueItem.CollectedKeys.Count == keys.Count)
+                    //{
+                    //    if (queueItem.Count < lowestSteps)
+                    //    {
+                    //        lowestSteps = queueItem.Count;
+                    //        Console.WriteLine(queueItem.Count);
+                    //    }
+
+                    //    continue;
+                    //}
+
+                    ////if (queueItem.KeyVisitedTooManyTimes())
+                    ////{
+                    ////    filteredByTimes++;
+                    ////    continue;
+                    ////}
+
+                    //if (queueItem.CollectedKeys.Count > 6)
+                    //{
+                    //    // annars sortera nycklar efter tagna och om samma nycklar osorterat tagna minus "4" sista sorterat? continue?
+                    //    //var key = string.Join("", queueItem.CollectedKeys.Keys.OrderBy(o => o)).GetHashCode();
+                    //    var key = qi.GetKey();
+                    //    if (visited.TryGetValue(key, out var count))
+                    //    {
+                    //        if (queueItem.Count >= count)
+                    //        {
+                    //            filteredByVisited++;
+                    //            continue;
+                    //        }
+                    //        else
+                    //        {
+                    //            visited[key] = queueItem.Count;
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        visited.Add(key, queueItem.Count);
+                    //    }
+                    //}
+                    ////var collected = new HashSet<int>(qi.CollectedKeys);
+                   
+                    queue.Enqueue(queueItem);
                 }
             }
         }
