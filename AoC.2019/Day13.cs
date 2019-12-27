@@ -63,7 +63,7 @@ namespace AoC2019
             {
                 var outputs = new List<long>();
 
-                for (int i = 0; i < 3; i++)
+                for (var i = 0; i < 3; i++)
                 {
                     intCodeMachine.LoopUntilHalt(0);
                     outputs.Add(intCodeMachine.Output);

@@ -1,27 +1,222 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using AoC.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AoC.Common;
-using static AoC.Common.SantaHelper;
 
 namespace AoC2019
 {
     /*
+    --- Day 20: Donut Maze ---
+    You notice a strange pattern on the surface of Pluto and land nearby to get a closer look. Upon closer inspection, you realize you've come across one of the famous space-warping mazes of the long-lost Pluto civilization!
 
+    Because there isn't much space on Pluto, the civilization that used to live here thrived by inventing a method for folding spacetime. Although the technology is no longer understood, mazes like this one provide a small glimpse into the daily life of an ancient Pluto citizen.
+
+    This maze is shaped like a donut. Portals along the inner and outer edge of the donut can instantly teleport you from one side to the other. For example:
+
+             A           
+             A           
+      #######.#########  
+      #######.........#  
+      #######.#######.#  
+      #######.#######.#  
+      #######.#######.#  
+      #####  B    ###.#  
+    BC...##  C    ###.#  
+      ##.##       ###.#  
+      ##...DE  F  ###.#  
+      #####    G  ###.#  
+      #########.#####.#  
+    DE..#######...###.#  
+      #.#########.###.#  
+    FG..#########.....#  
+      ###########.#####  
+                 Z       
+                 Z       
+    This map of the maze shows solid walls (#) and open passages (.). Every maze on Pluto has a start (the open tile next to AA) and an end (the open tile next to ZZ). Mazes on Pluto also have portals; this maze has three pairs of portals: BC, DE, and FG. When on an open tile next to one of these labels, a single step can take you to the other tile with the same label. (You can only walk on . tiles; labels and empty space are not traversable.)
+
+    One path through the maze doesn't require any portals. Starting at AA, you could go down 1, right 8, down 12, left 4, and down 1 to reach ZZ, a total of 26 steps.
+
+    However, there is a shorter path: You could walk from AA to the inner BC portal (4 steps), warp to the outer BC portal (1 step), walk to the inner DE (6 steps), warp to the outer DE (1 step), walk to the outer FG (4 steps), warp to the inner FG (1 step), and finally walk to ZZ (6 steps). In total, this is only 23 steps.
+
+    Here is a larger example:
+
+                       A               
+                       A               
+      #################.#############  
+      #.#...#...................#.#.#  
+      #.#.#.###.###.###.#########.#.#  
+      #.#.#.......#...#.....#.#.#...#  
+      #.#########.###.#####.#.#.###.#  
+      #.............#.#.....#.......#  
+      ###.###########.###.#####.#.#.#  
+      #.....#        A   C    #.#.#.#  
+      #######        S   P    #####.#  
+      #.#...#                 #......VT
+      #.#.#.#                 #.#####  
+      #...#.#               YN....#.#  
+      #.###.#                 #####.#  
+    DI....#.#                 #.....#  
+      #####.#                 #.###.#  
+    ZZ......#               QG....#..AS
+      ###.###                 #######  
+    JO..#.#.#                 #.....#  
+      #.#.#.#                 ###.#.#  
+      #...#..DI             BU....#..LF
+      #####.#                 #.#####  
+    YN......#               VT..#....QG
+      #.###.#                 #.###.#  
+      #.#...#                 #.....#  
+      ###.###    J L     J    #.#.###  
+      #.....#    O F     P    #.#...#  
+      #.###.#####.#.#####.#####.###.#  
+      #...#.#.#...#.....#.....#.#...#  
+      #.#####.###.###.#.#.#########.#  
+      #...#.#.....#...#.#.#.#.....#.#  
+      #.###.#####.###.###.#.#.#######  
+      #.#.........#...#.............#  
+      #########.###.###.#############  
+               B   J   C               
+               U   P   P               
+    Here, AA has no direct path to ZZ, but it does connect to AS and CP. By passing through AS, QG, BU, and JO, you can reach ZZ in 58 steps.
+
+    In your maze, how many steps does it take to get from the open tile marked AA to the open tile marked ZZ?
+
+    Your puzzle answer was 422.
+
+    --- Part Two ---
+    Strangely, the exit isn't open when you reach it. Then, you remember: the ancient Plutonians were famous for building recursive spaces.
+
+    The marked connections in the maze aren't portals: they physically connect to a larger or smaller copy of the maze. Specifically, the labeled tiles around the inside edge actually connect to a smaller copy of the same maze, and the smaller copy's inner labeled tiles connect to yet a smaller copy, and so on.
+
+    When you enter the maze, you are at the outermost level; when at the outermost level, only the outer labels AA and ZZ function (as the start and end, respectively); all other outer labeled tiles are effectively walls. At any other level, AA and ZZ count as walls, but the other outer labeled tiles bring you one level outward.
+
+    Your goal is to find a path through the maze that brings you back to ZZ at the outermost level of the maze.
+
+    In the first example above, the shortest path is now the loop around the right side. If the starting level is 0, then taking the previously-shortest path would pass through BC (to level 1), DE (to level 2), and FG (back to level 1). Because this is not the outermost level, ZZ is a wall, and the only option is to go back around to BC, which would only send you even deeper into the recursive maze.
+
+    In the second example above, there is no path that brings you to ZZ at the outermost level.
+
+    Here is a more interesting example:
+
+                 Z L X W       C                 
+                 Z P Q B       K                 
+      ###########.#.#.#.#######.###############  
+      #...#.......#.#.......#.#.......#.#.#...#  
+      ###.#.#.#.#.#.#.#.###.#.#.#######.#.#.###  
+      #.#...#.#.#...#.#.#...#...#...#.#.......#  
+      #.###.#######.###.###.#.###.###.#.#######  
+      #...#.......#.#...#...#.............#...#  
+      #.#########.#######.#.#######.#######.###  
+      #...#.#    F       R I       Z    #.#.#.#  
+      #.###.#    D       E C       H    #.#.#.#  
+      #.#...#                           #...#.#  
+      #.###.#                           #.###.#  
+      #.#....OA                       WB..#.#..ZH
+      #.###.#                           #.#.#.#  
+    CJ......#                           #.....#  
+      #######                           #######  
+      #.#....CK                         #......IC
+      #.###.#                           #.###.#  
+      #.....#                           #...#.#  
+      ###.###                           #.#.#.#  
+    XF....#.#                         RF..#.#.#  
+      #####.#                           #######  
+      #......CJ                       NM..#...#  
+      ###.#.#                           #.###.#  
+    RE....#.#                           #......RF
+      ###.###        X   X       L      #.#.#.#  
+      #.....#        F   Q       P      #.#.#.#  
+      ###.###########.###.#######.#########.###  
+      #.....#...#.....#.......#...#.....#.#...#  
+      #####.#.###.#######.#######.###.###.#.#.#  
+      #.......#.......#.#.#.#.#...#...#...#.#.#  
+      #####.###.#####.#.#.#.#.###.###.#.###.###  
+      #.......#.....#.#...#...............#...#  
+      #############.#.#.###.###################  
+                   A O F   N                     
+                   A A D   M                     
+    One shortest path through the maze is the following:
+
+    Walk from AA to XF (16 steps)
+    Recurse into level 1 through XF (1 step)
+    Walk from XF to CK (10 steps)
+    Recurse into level 2 through CK (1 step)
+    Walk from CK to ZH (14 steps)
+    Recurse into level 3 through ZH (1 step)
+    Walk from ZH to WB (10 steps)
+    Recurse into level 4 through WB (1 step)
+    Walk from WB to IC (10 steps)
+    Recurse into level 5 through IC (1 step)
+    Walk from IC to RF (10 steps)
+    Recurse into level 6 through RF (1 step)
+    Walk from RF to NM (8 steps)
+    Recurse into level 7 through NM (1 step)
+    Walk from NM to LP (12 steps)
+    Recurse into level 8 through LP (1 step)
+    Walk from LP to FD (24 steps)
+    Recurse into level 9 through FD (1 step)
+    Walk from FD to XQ (8 steps)
+    Recurse into level 10 through XQ (1 step)
+    Walk from XQ to WB (4 steps)
+    Return to level 9 through WB (1 step)
+    Walk from WB to ZH (10 steps)
+    Return to level 8 through ZH (1 step)
+    Walk from ZH to CK (14 steps)
+    Return to level 7 through CK (1 step)
+    Walk from CK to XF (10 steps)
+    Return to level 6 through XF (1 step)
+    Walk from XF to OA (14 steps)
+    Return to level 5 through OA (1 step)
+    Walk from OA to CJ (8 steps)
+    Return to level 4 through CJ (1 step)
+    Walk from CJ to RE (8 steps)
+    Return to level 3 through RE (1 step)
+    Walk from RE to IC (4 steps)
+    Recurse into level 4 through IC (1 step)
+    Walk from IC to RF (10 steps)
+    Recurse into level 5 through RF (1 step)
+    Walk from RF to NM (8 steps)
+    Recurse into level 6 through NM (1 step)
+    Walk from NM to LP (12 steps)
+    Recurse into level 7 through LP (1 step)
+    Walk from LP to FD (24 steps)
+    Recurse into level 8 through FD (1 step)
+    Walk from FD to XQ (8 steps)
+    Recurse into level 9 through XQ (1 step)
+    Walk from XQ to WB (4 steps)
+    Return to level 8 through WB (1 step)
+    Walk from WB to ZH (10 steps)
+    Return to level 7 through ZH (1 step)
+    Walk from ZH to CK (14 steps)
+    Return to level 6 through CK (1 step)
+    Walk from CK to XF (10 steps)
+    Return to level 5 through XF (1 step)
+    Walk from XF to OA (14 steps)
+    Return to level 4 through OA (1 step)
+    Walk from OA to CJ (8 steps)
+    Return to level 3 through CJ (1 step)
+    Walk from CJ to RE (8 steps)
+    Return to level 2 through RE (1 step)
+    Walk from RE to XQ (14 steps)
+    Return to level 1 through XQ (1 step)
+    Walk from XQ to FD (8 steps)
+    Return to level 0 through FD (1 step)
+    Walk from FD to ZZ (18 steps)
+    This path takes a total of 396 steps to move from AA at the outermost layer to ZZ at the outermost layer.
+
+    In your maze, when accounting for recursion, how many steps does it take to get from the open tile marked AA to the open tile marked ZZ, both at the outermost layer?
+
+    Your puzzle answer was 5040.
     */
 
     public class Day20 : Day
     {
-        public override string Title => "";
+        public override string Title => "--- Day 20: Donut Maze ---";
         private readonly string abc = "abcdefghijklmnopqrstuvwxyz".ToUpper();
         public List<DonutItem> all;
 
         public override void PartOne()
         {
-            return;
             base.PartOne();
             var input = Inputs.Day20.ToStringList();
 //            input = @"                   A               
@@ -158,9 +353,9 @@ namespace AoC2019
 
             var startPortal = portals.First(f => f.Name == "AA");
             var targetPortal = portals.First(f => f.Name == "ZZ");
-            
+
             var ls = int.MaxValue;
-            ClosestByPortal(startPortal, targetPortal, startPortal, new List<Portal>() {startPortal},  0, ref ls);
+            ClosestByPortal(startPortal, targetPortal, startPortal, new List<Portal>() {startPortal}, 0, ref ls);
 
             Console.WriteLine(ls);
         }
@@ -215,17 +410,14 @@ namespace AoC2019
                 {
                     var visited2 = new List<Portal>(visited);
                     visited2.Add(pD.Portal);
-                    Console.WriteLine(string.Join(", ", visited2) + " in " + (count+pD.Distance));
+                    Console.WriteLine(string.Join(", ", visited2) + " in " + (count + pD.Distance));
                     if (count + pD.Distance < lowestSteps)
                     {
                         lowestSteps = count + pD.Distance;
                     }
-
-                    //return;
                 }
             }
         }
-
 
         public override void PartTwo()
         {
@@ -287,28 +479,28 @@ namespace AoC2019
                     if (otherChar.Coordinate.X < donutItem.Coordinate.X)
                     {
                         portals.Add(new Portal
-                        { Coordinate = traversable.Coordinate, Name = "" + otherChar.Symbol + donutItem.Symbol });
+                            {Coordinate = traversable.Coordinate, Name = "" + otherChar.Symbol + donutItem.Symbol});
                         continue;
                     }
 
                     if (otherChar.Coordinate.X > donutItem.Coordinate.X)
                     {
                         portals.Add(new Portal
-                        { Coordinate = traversable.Coordinate, Name = "" + donutItem.Symbol + otherChar.Symbol });
+                            {Coordinate = traversable.Coordinate, Name = "" + donutItem.Symbol + otherChar.Symbol});
                         continue;
                     }
 
                     if (otherChar.Coordinate.Y > donutItem.Coordinate.Y)
                     {
                         portals.Add(new Portal
-                        { Coordinate = traversable.Coordinate, Name = "" + donutItem.Symbol + otherChar.Symbol });
+                            {Coordinate = traversable.Coordinate, Name = "" + donutItem.Symbol + otherChar.Symbol});
                         continue;
                     }
 
                     if (otherChar.Coordinate.Y < donutItem.Coordinate.Y)
                     {
                         portals.Add(new Portal
-                        { Coordinate = traversable.Coordinate, Name = "" + otherChar.Symbol + donutItem.Symbol });
+                            {Coordinate = traversable.Coordinate, Name = "" + otherChar.Symbol + donutItem.Symbol});
                         continue;
                     }
                 }
@@ -364,7 +556,7 @@ namespace AoC2019
             }
 
             var startPortal = portals.First(f => f.Name == "AA");
-            var targetPortal = portals.First(f => f.Name == "ZZ"); 
+            var targetPortal = portals.First(f => f.Name == "ZZ");
             SetInner(portals);
 
             var f1 = new QueueItem
@@ -377,10 +569,6 @@ namespace AoC2019
             };
 
             ClosestByLevelQueue(f1, targetPortal.Coordinate);
-
-            //var ls = int.MaxValue;
-            //ClosestByLevel(startPortal, targetPortal, startPortal, new List<string>() { startPortal.GetLevelKey(0) }, 0, 0, ref ls);
-
             Console.WriteLine("this " + lowestSteps);
         }
 
@@ -390,7 +578,8 @@ namespace AoC2019
             var maxX = portals.Max(m => m.Coordinate.X);
             foreach (var portal in portals)
             {
-                if (portal.Coordinate.Y == 2 || portal.Coordinate.X == 2 || portal.Coordinate.Y == maxY || portal.Coordinate.X == maxX)
+                if (portal.Coordinate.Y == 2 || portal.Coordinate.X == 2 || portal.Coordinate.Y == maxY ||
+                    portal.Coordinate.X == maxX)
                 {
                     portal.Inner = false;
                     continue;
@@ -400,93 +589,14 @@ namespace AoC2019
             }
         }
 
-        private static List<string> test = new List<string>() {"AA0",
-            "XF0",
-            "XF1",
-            "CK1",
-            "CK2",
-            "ZH2",
-            "ZH3",
-            "WB3",
-            "WB4",
-            "IC4",
-            "IC5",
-            "RF5",
-            "RF6",
-            "NM6",
-            "NM7",
-            "LP7",
-            "LP8",
-            "FD8",
-            "FD9",
-            "XQ9",
-            "XQ10",
-            "WB10",
-            "WB9",
-            "ZH9",
-            "ZH8",
-            "CK8",
-            "CK7",
-            "XF7",
-            "XF6",
-            "OA6",
-            "OA5",
-            "CJ5",
-            "CJ4",
-            "RE4",
-            "RE3",
-            "IC3",
-            "IC4",
-            "RF4",
-            "RF5",
-            "NM5",
-            "NM6",
-            "LP6",
-            "LP7",
-            "FD7",
-            "FD8",
-            "XQ8",
-            "XQ9",
-            "WB9",
-            "WB8",
-            "ZH8",
-            "ZH7",
-            "CK7",
-            "CK6",
-            "XF6",
-            "XF5",
-            "OA5",
-            "OA4",
-            "CJ4",
-            "CJ3",
-            "RE3",
-            "RE2",
-            "XQ2",
-            "XQ1",
-            "FD1",
-            "FD0"
-        };
-
         public int lowestSteps = int.MaxValue;
-        public int started = 0;
-        public object locker = new object();
-
-        public IEnumerable<bool> QueueGet()
-        {
-            if (started < 8)
-            {
-                yield return true;
-            }
-        }
 
         private void
             ClosestByLevelQueue(QueueItem first, Coordinate to)
         {
             var queue = new Queue<QueueItem>();
             queue.Enqueue(first);
-
             var visited = new List<Tuple<Coordinate, int>>();
-            //visited.Add(new Tuple<Coordinate, int>(first.Coordinate, first.Level));
 
             while (queue.Count > 0)
             {
@@ -520,9 +630,8 @@ namespace AoC2019
                 }
 
                 visited.Add(new Tuple<Coordinate, int>(qi.Coordinate, qi.Level));
-                //Console.WriteLine(qi.From.Name + ", dist ("+qi.Count+"), lvl ("+qi.Level+")");
-
-                var visitablePortals = qi.From.ConnectedTo.Where(c => OnlyInner(c.Portal) && c.Portal != qi.From.Exit).ToList();
+                var visitablePortals = qi.From.ConnectedTo.Where(c => OnlyInner(c.Portal) && c.Portal != qi.From.Exit)
+                    .ToList();
 
                 foreach (var pD in visitablePortals)
                 {
@@ -557,32 +666,13 @@ namespace AoC2019
                         Level = llevel,
                         Steps = steps
                     });
-                    //var level2 = qi.Level;
-
-                    //queue.Enqueue(new QueueItem
-                    //{
-                    //    From = pD.Portal, Coordinate = pD.Portal.Coordinate, Count = count + pD.Distance, Level = level2
-                    //});
-                    //ClosestByLevel(pD.Portal, to, from, visited2, count + pD.Distance, llevel, ref lowestSteps);
                 }
-
-                //if (from.Exit != null)
-                //{
-                //    var llevel = qi.From.Inner ? qi.Level + 1 : qi.Level - 1;
-                //    queue.Enqueue(new QueueItem
-                //    {
-                //        From = from.Exit,
-                //        Coordinate = from.Exit.Coordinate,
-                //        Count = count + 1,
-                //        Level = llevel
-                //    });
-                //}
             }
         }
 
-
         private void
-            ClosestByLevel(Portal from, Portal to, Portal last, List<string> visited, int count, int level, ref int lowestSteps)
+            ClosestByLevel(Portal from, Portal to, Portal last, List<string> visited, int count, int level,
+                ref int lowestSteps)
         {
             if (count > lowestSteps || level < 0 || level > 35 || count > 500)
             {
@@ -591,14 +681,13 @@ namespace AoC2019
 
             bool OnlyInner(Portal p)
             {
-
                 if (p.GetLevel(level, @from) > 0 || (p.Inner || p.Name == "ZZ"))
                 {
                     return true;
                 }
 
                 return false;
-            };
+            }
 
             var visitablePortals = from.ConnectedTo.Where(c => !ReferenceEquals(c.Portal, last) &&
                                                                OnlyInner(c.Portal)).Reverse().ToList();
@@ -629,6 +718,7 @@ namespace AoC2019
                         llevel = from.Inner ? level2 + 1 : level2 - 1;
                         key = pD.Portal.GetLevelKey(llevel);
                     }
+
                     visited2.Add(key);
 
                     if (visited2.Count(s => s == key) > 2)
@@ -720,17 +810,6 @@ namespace AoC2019
             return Name;
         }
 
-        public string GetLevelKey(int level, Portal p)
-        {
-            if (p.Exit == this)
-            {
-                var llevel = p.Inner ? level + 1 : level - 1;
-                return Name + llevel;
-            }
-
-            return Name + level;
-        }
-
         public int GetLevel(int level, Portal p)
         {
             if (p.Exit == this)
@@ -746,28 +825,6 @@ namespace AoC2019
         {
             return Name + level;
         }
-
-        public string GetCompoundKey(int level, Portal from)
-        {
-            if (Name == "ZZ" || Name == "AA")
-            {
-                return Name + level;
-            }
-
-            var key = GetLevelKey(level, from);
-
-            if (Name == from.Name)
-            {
-                key = Name + level + key;
-            }
-
-            if (Name != from.Name)
-            {
-                key = key + Exit.GetLevelKey(level, this);
-            }
-
-            return key;
-        }
     }
 
     public class PortalDistance
@@ -780,11 +837,4 @@ namespace AoC2019
             return $"{Distance} steps to {Portal.Name}";
         }
     }
-
-    public class PortalLevel
-    {
-        public int Level;
-        public Portal Portal;
-    }
-
 }

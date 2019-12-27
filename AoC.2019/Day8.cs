@@ -164,7 +164,7 @@ namespace AoC2019
             AsString = string.Join("", layerData);
 
             var skip = 0;
-            for (int i = 0; i < Height; i++)
+            for (var i = 0; i < Height; i++)
             {
                 var currentLayer = layerData.Skip(skip).Take(Width).ToArray();
                 Layers.Add(currentLayer);
