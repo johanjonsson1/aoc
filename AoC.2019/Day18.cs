@@ -21,6 +21,7 @@ namespace AoC2019
 
         public override void PartOne()
         {
+            return;
             base.PartOne();
             var input = Inputs.Day18.ToStringList();
 //            input = @"#################
@@ -169,6 +170,65 @@ namespace AoC2019
             return true;
         }
 
+        private static Grid<Coordinate, Area> CreateAreas2(List<string> input, out List<Coordinate> startPositions)
+        {
+            var abc = "abcdefghijklmnopqrstuvwxyz";
+            var grid = new Grid<Coordinate, Area>();
+
+            //########################
+            //#f.D.E.e.C.b.A.@.a.B.c.#
+            //######################.#
+            //#d.....................#
+            //########################
+            startPositions = new List<Coordinate>();
+
+            for (var y = 0; y < input.Count; y++)
+            {
+                for (var x = 0; x < input[0].Length; x++)
+                {
+                    var newCoord = new Coordinate(x, y);
+
+                    if (input[y][x] == '#')
+                    {
+                        var wall = new Area { Coordinate = newCoord, IsWall = true };
+                        grid.Add(newCoord, wall);
+                        continue;
+                    }
+
+                    if (input[y][x] == '.')
+                    {
+                        var hallway = new Area { Coordinate = newCoord, IsWall = false };
+                        grid.Add(newCoord, hallway);
+                        continue;
+                    }
+
+                    if (input[y][x] == '@')
+                    {
+                        startPositions.Add(newCoord);
+                        var hallway = new Area { Coordinate = newCoord, IsWall = false };
+                        grid.Add(newCoord, hallway);
+                        continue;
+                    }
+
+                    if (abc.Contains(input[y][x]))
+                    {
+                        var key = new Key { Coordinate = newCoord, Id = input[y][x] };
+                        grid.Add(newCoord, key);
+                        continue;
+                    }
+
+                    if (abc.ToUpper().Contains(input[y][x]))
+                    {
+                        var key = new Door() { Coordinate = newCoord, Id = input[y][x].ToString().ToLower()[0] };
+                        grid.Add(newCoord, key);
+                        continue;
+                    }
+                }
+            }
+
+            return grid;
+        }
+
         private static Grid<Coordinate, Area> CreateAreas(List<string> input, out Coordinate startPosition)
         {
             var abc = "abcdefghijklmnopqrstuvwxyz";
@@ -231,7 +291,130 @@ namespace AoC2019
         public override void PartTwo()
         {
             base.PartTwo();
+            var input = Inputs.Day18_Part2.ToStringList();
+//            input = @"#############
+//#DcBa.#.GhKl#
+//#.###@#@#I###
+//#e#d#####j#k#
+//###C#@#@###J#
+//#fEbA.#.FgHi#
+//#############".ToStringList();
+
+            Grid = CreateAreas2(input, out var startPositions);
+            all = Grid.GetAll();
+            keys = all.Where(a => a is Key).Cast<Key>().ToList();
+
+            foreach (var key in keys)
+            {
+                Console.WriteLine("Finding distances doors n keys between keys for key " + (char)key.Id);
+                foreach (var otherKey in keys.Where(x => x.Id != key.Id))
+                {
+                    var lowestSteps = int.MaxValue;
+                    var doors = new List<Door>();
+                    var keysBetween = new List<Key>();
+
+                    FindWithDoorsAndKeysNoOverflow(new DoorKeysQueueItem
+                    {
+                        From = key.Coordinate,
+                        To = otherKey.Coordinate,
+                        Last = new Coordinate(int.MinValue, int.MinValue),
+                        Count = 0,
+                        DoorsBetween = new List<Door>(),
+                        KeysBetween = new List<Key>()
+                    }, ref lowestSteps, ref doors, ref keysBetween);
+
+                    if (lowestSteps == int.MaxValue)
+                    {
+                        continue;
+                    }
+
+                    key.Distances.Add(new KeyDistance
+                    {
+                        Distance = lowestSteps,
+                        DoorsBetween = doors.Select(s => s.Id).ToArray(),
+                        KeysBetween = keysBetween.Select(s => s.Id).ToArray(),
+                        Key = otherKey
+                    });
+                }
+
+                key.Distances = key.Distances.OrderBy(o => o.Distance).ToList();
+            }
+
+            var subgrids = new List<SubGrid>();
+
+            foreach (var startPosition in startPositions)
+            {
+                var reachableKeys = new List<Tuple<Key, int>>();
+                foreach (var key in keys)
+                {
+                    Console.WriteLine("Checking if reachable key " + (char)key.Id);
+                    var lowestSteps = int.MaxValue;
+                    var doors = new List<Door>();
+                    var keysBetween = new List<Key>();
+
+                    FindWithDoorsAndKeysNoOverflow(new DoorKeysQueueItem
+                    {
+                        From = startPosition,
+                        To = key.Coordinate,
+                        Last = new Coordinate(int.MinValue, int.MinValue),
+                        Count = 0,
+                        DoorsBetween = new List<Door>(),
+                        KeysBetween = new List<Key>()
+                    }, ref lowestSteps, ref doors, ref keysBetween);
+
+                    if (lowestSteps == int.MaxValue)
+                    {
+                        continue;
+                    }
+
+                    //if (doors.Count == 0)
+                    //{
+                        reachableKeys.Add(new Tuple<Key, int>(key, lowestSteps));
+                    //}
+                }
+
+                subgrids.Add(new SubGrid {Start = startPosition, Reachable = reachableKeys});
+            }
+
+            GC.Collect();
+
+            var sum = 0;
+
+            foreach (var subgrid in subgrids)
+            {
+                var lowestOfTheLow = int.MaxValue;
+                var allKeys = subgrid.Reachable.Select(s => s.Item1).ToList();
+                foreach (var reachableKey in subgrid.Reachable)
+                {
+                    Console.WriteLine("Checking fewest steps starting from " + (char)reachableKey.Item1.Id);
+                    FindNewQueue2(new AreaQueue
+                    {
+                        CollectedKeys = new Dictionary<int, int>(),//new HashSet<int>(),
+                        Count = reachableKey.Item2,
+                        Current = reachableKey.Item1
+                    }, ref lowestOfTheLow, ref allKeys);
+
+                    GC.Collect();
+                }
+
+                if (lowestOfTheLow == int.MaxValue)
+                {
+                    Console.WriteLine("FAILURE!");
+                }
+                else
+                {
+                    sum += lowestOfTheLow;
+                }
+            }
+
+            Console.WriteLine("Final: " + sum);
             Console.WriteLine();
+        }
+
+        public class SubGrid
+        {
+            public Coordinate Start;
+            public List<Tuple<Key, int>> Reachable = new List<Tuple<Key, int>>();
         }
 
         public class AreaQueue
@@ -266,6 +449,106 @@ namespace AoC2019
 
         //public int lowestSteps = int.MaxValue;
         public Dictionary<string, int> visited = new Dictionary<string, int>();
+
+        private void
+FindNewQueue2(AreaQueue first, ref int lowestSteps, ref List<Key> allKeys)
+        {
+            var queue = new Queue<AreaQueue>();
+            queue.Enqueue(first);
+            var counter = 0;
+            var filteredByTimes = 0;
+            var filteredByVisited = 0;
+
+            while (queue.Count > 0)
+            {
+                counter++;
+
+                if (counter % 300000 == 0)
+                {
+                    Console.WriteLine("q " + queue.Count);
+                    Console.WriteLine("times " + filteredByTimes);
+                    Console.WriteLine("visited " + filteredByVisited);
+                }
+
+                var qi = queue.Dequeue();
+
+                if (qi.Count > lowestSteps)
+                {
+                    continue;
+                }
+
+                var distances = qi.From?.Distances?.FirstOrDefault(f => f.Key.Id == qi.Current.Id);
+                //if (distances != null)
+                //{
+                //    var doors = distances.DoorsBetween;
+                //    if (doors.Except(qi.CollectedKeys.Keys).Any())
+                //    {
+                //        continue;
+                //    }
+                //    // unlocked
+                //}
+
+                qi.Addkey(qi.Current.Id);
+                if (distances != null)
+                {
+                    foreach (var ki in distances.KeysBetween)
+                    {
+                        qi.Addkey(ki);
+                    }
+                }
+
+                if (qi.CollectedKeys.Count == allKeys.Count)
+                {
+                    if (qi.Count < lowestSteps)
+                    {
+                        lowestSteps = qi.Count;
+                        Console.WriteLine(qi.Count);
+                    }
+
+                    continue;
+                }
+
+                if (qi.CollectedKeys.Any())
+                {
+                    var key = qi.GetKey();
+                    if (visited.TryGetValue(key, out var count))
+                    {
+                        if (qi.Count >= count)
+                        {
+                            filteredByVisited++;
+                            continue;
+                        }
+                        else
+                        {
+                            visited[key] = qi.Count;
+                        }
+                    }
+                    else
+                    {
+                        visited.Add(key, qi.Count);
+                    }
+                }
+
+                var visitableKeys = qi.Current.Distances.Where(
+                        d => !qi.CollectedKeys.Keys.Contains(d.Key.Id))
+                    .ToList();
+
+                foreach (var k in visitableKeys)
+                {
+                    var collected = new Dictionary<int, int>(qi.CollectedKeys);
+                    var queueItem = new AreaQueue
+                    {
+                        CollectedKeys = collected,
+                        Count = qi.Count + k.Distance,
+                        Current = k.Key,
+                        From = qi.Current
+                    };
+
+                    queue.Enqueue(queueItem);
+                }
+            }
+        }
+
 
         private void
     FindNewQueue(AreaQueue first, ref int lowestSteps)
