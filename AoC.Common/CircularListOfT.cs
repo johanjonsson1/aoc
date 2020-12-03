@@ -66,5 +66,11 @@ namespace AoC.Common
 
             return index;
         }
+
+        public T this[int i]
+        {
+            get => Items[i % Items.Count];
+            set => Items[i % Items.Count] = value;
+        }
     }
 }
