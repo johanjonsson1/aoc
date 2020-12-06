@@ -12,9 +12,9 @@ namespace AoC.Common
             return input.Select(s => (int)char.GetNumericValue(s)).ToList();
         }
 
-        public static List<string> ToStringList(this string input)
+        public static List<string> ToStringList(this string input, bool leaveEmpty = false)
         {
-            return input.Split('\r', '\n').Where(x => x != "").ToList();
+            return leaveEmpty ? input.Split('\r', '\n').ToList() : input.Split('\r', '\n').Where(x => x != "").ToList();
         }
 
         public static string ToBinaryString(this string input)
