@@ -86,6 +86,11 @@ namespace AoC.Common
             return Regex.Replace(input, "[A-Za-z]", "");
         }
 
+        public static string Remove0To9(this string input)
+        {
+            return Regex.Replace(input, "[0-9]", "");
+        }
+
         public static string RemoveSomeSpecialCharacters(this string input)
         {
             return Regex.Replace(input, "[^0-9a-zA-Z- ]+", "");
