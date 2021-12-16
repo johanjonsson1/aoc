@@ -1,143 +1,136 @@
-﻿using System;
-using System.Collections.Generic;
-using AoC.Common;
-using static AoC.Common.SantaHelper;
+﻿namespace AoC2019;
+/*
+--- Day 25: Cryostasis ---
+As you approach Santa's ship, your sensors report two important details:
 
-namespace AoC2019
+First, that you might be too late: the internal temperature is -40 degrees.
+
+Second, that one faint life signature is somewhere on the ship.
+
+The airlock door is locked with a code; your best option is to send in a small droid to investigate the situation. You attach your ship to Santa's, break a small hole in the hull, and let the droid run in before you seal it up again. Before your ship starts freezing, you detach your ship and set it to automatically stay within range of Santa's ship.
+
+This droid can follow basic instructions and report on its surroundings; you can communicate with it through an Intcode program (your puzzle input) running on an ASCII-capable computer.
+
+As the droid moves through its environment, it will describe what it encounters. When it says Command?, you can give it a single instruction terminated with a newline (ASCII code 10). Possible instructions are:
+
+Movement via north, south, east, or west.
+To take an item the droid sees in the environment, use the command take <name of item>. For example, if the droid reports seeing a red ball, you can pick it up with take red ball.
+To drop an item the droid is carrying, use the command drop <name of item>. For example, if the droid is carrying a green ball, you can drop it with drop green ball.
+To get a list of all of the items the droid is currently carrying, use the command inv (for "inventory").
+Extra spaces or other characters aren't allowed - instructions must be provided precisely.
+
+Santa's ship is a Reindeer-class starship; these ships use pressure-sensitive floors to determine the identity of droids and crew members. The standard configuration for these starships is for all droids to weigh exactly the same amount to make them easier to detect. If you need to get past such a sensor, you might be able to reach the correct weight by carrying items from the environment.
+
+Look around the ship and see if you can find the password for the main airlock.
+
+Your puzzle answer was 20483.
+
+The first half of this puzzle is complete! It provides one gold star: *
+
+--- Part Two ---
+As you move through the main airlock, the air inside the ship is already heating up to reasonable levels. Santa explains that he didn't notice you coming because he was just taking a quick nap. The ship wasn't frozen; he just had the thermostat set to "North Pole".
+
+You make your way over to the navigation console. It beeps. "Status: Stranded. Please supply measurements from 49 stars to recalibrate."
+
+"49 stars? But the Elves told me you needed fifty--"
+
+Santa just smiles and nods his head toward the window. There, in the distance, you can see the center of the Solar System: the Sun!
+
+The navigation console beeps again.
+
+You don't have enough stars to align the warp drive, though. You need 1 more.
+*/
+
+public class Day25 : Day
 {
-    /*
-    --- Day 25: Cryostasis ---
-    As you approach Santa's ship, your sensors report two important details:
+    public override string Title => "--- Day 25: Cryostasis ---";
 
-    First, that you might be too late: the internal temperature is -40 degrees.
-
-    Second, that one faint life signature is somewhere on the ship.
-
-    The airlock door is locked with a code; your best option is to send in a small droid to investigate the situation. You attach your ship to Santa's, break a small hole in the hull, and let the droid run in before you seal it up again. Before your ship starts freezing, you detach your ship and set it to automatically stay within range of Santa's ship.
-
-    This droid can follow basic instructions and report on its surroundings; you can communicate with it through an Intcode program (your puzzle input) running on an ASCII-capable computer.
-
-    As the droid moves through its environment, it will describe what it encounters. When it says Command?, you can give it a single instruction terminated with a newline (ASCII code 10). Possible instructions are:
-
-    Movement via north, south, east, or west.
-    To take an item the droid sees in the environment, use the command take <name of item>. For example, if the droid reports seeing a red ball, you can pick it up with take red ball.
-    To drop an item the droid is carrying, use the command drop <name of item>. For example, if the droid is carrying a green ball, you can drop it with drop green ball.
-    To get a list of all of the items the droid is currently carrying, use the command inv (for "inventory").
-    Extra spaces or other characters aren't allowed - instructions must be provided precisely.
-
-    Santa's ship is a Reindeer-class starship; these ships use pressure-sensitive floors to determine the identity of droids and crew members. The standard configuration for these starships is for all droids to weigh exactly the same amount to make them easier to detect. If you need to get past such a sensor, you might be able to reach the correct weight by carrying items from the environment.
-
-    Look around the ship and see if you can find the password for the main airlock.
-
-    Your puzzle answer was 20483.
-
-    The first half of this puzzle is complete! It provides one gold star: *
-
-    --- Part Two ---
-    As you move through the main airlock, the air inside the ship is already heating up to reasonable levels. Santa explains that he didn't notice you coming because he was just taking a quick nap. The ship wasn't frozen; he just had the thermostat set to "North Pole".
-
-    You make your way over to the navigation console. It beeps. "Status: Stranded. Please supply measurements from 49 stars to recalibrate."
-
-    "49 stars? But the Elves told me you needed fifty--"
-
-    Santa just smiles and nods his head toward the window. There, in the distance, you can see the center of the Solar System: the Sun!
-
-    The navigation console beeps again.
-
-    You don't have enough stars to align the warp drive, though. You need 1 more.
-    */
-
-    public class Day25 : Day
+    public override void PartOne()
     {
-        public override string Title => "--- Day 25: Cryostasis ---";
+        base.PartOne();
+        var input = Inputs.Day25.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
+        var droid = new SmallDroid(input);
+        droid.ReceiveMovementRoutine(GetCommands(false));
 
-        public override void PartOne()
+        Console.WriteLine("Command list:");
+        foreach (var droidCommand in droid.Commands)
         {
-            base.PartOne();
-            var input = Inputs.Day25.SplitAsLongsBy(',').ToArray().ExpandTo(100000);
-            var droid = new SmallDroid(input);
-            droid.ReceiveMovementRoutine(GetCommands(false));
-
-            Console.WriteLine("Command list:");
-            foreach (var droidCommand in droid.Commands)
-            {
-                Console.WriteLine(droidCommand);
-            }
-
-            Console.WriteLine();
+            Console.WriteLine(droidCommand);
         }
 
-        public override void PartTwo()
-        {
-            base.PartTwo();
-            Console.WriteLine();
-        }
-
-        private IEnumerable<int> GetCommands(bool run)
-        {
-            var command = "south\ntake mouse\nnorth\n"; // MANUALLY SEE EXCEL
-
-            foreach (var c in command)
-            {
-                yield return c;
-            }
-        }
+        Console.WriteLine();
     }
 
-    public class SmallDroid
+    public override void PartTwo()
     {
-        public readonly IntCodeProgram IntCodeProgram;
-        public readonly List<string> Commands = new List<string>();
+        base.PartTwo();
+        Console.WriteLine();
+    }
 
-        public SmallDroid(long[] memory)
+    private IEnumerable<int> GetCommands(bool run)
+    {
+        var command = "south\ntake mouse\nnorth\n"; // MANUALLY SEE EXCEL
+
+        foreach (var c in command)
         {
-            IntCodeProgram = new IntCodeProgram(memory);
+            yield return c;
         }
+    }
+}
 
-        public long ReceiveMovementRoutine(IEnumerable<int> routineAndFunctions)
+public class SmallDroid
+{
+    public readonly IntCodeProgram IntCodeProgram;
+    public readonly List<string> Commands = new List<string>();
+
+    public SmallDroid(long[] memory)
+    {
+        IntCodeProgram = new IntCodeProgram(memory);
+    }
+
+    public long ReceiveMovementRoutine(IEnumerable<int> routineAndFunctions)
+    {
+        var inp = "";
+        while (!IntCodeProgram.IsTerminated)
         {
-            var inp = "";
-            while (!IntCodeProgram.IsTerminated)
+            if (inp != "")
             {
-                if (inp != "")
+                Commands.Add(inp + '\n');
+
+                foreach (var c in inp)
                 {
-                    Commands.Add(inp + '\n');
-
-                    foreach (var c in inp)
-                    {
-                        IntCodeProgram.AddInput(c);
-                    }
-
-                    IntCodeProgram.AddInput('\n');
-
-                    inp = "";
+                    IntCodeProgram.AddInput(c);
                 }
 
-                IntCodeProgram.LoopUntilHalt(0);
-                var locationState = IntCodeProgram.Output;
+                IntCodeProgram.AddInput('\n');
 
-                if (locationState > 127)
-                {
-                    Console.WriteLine(locationState);
-                    break;
-                }
-
-                var asChar = (char) locationState;
-                Console.Write(asChar);
-
-                if (asChar == '?')
-                {
-                    inp = Console.ReadLine();
-                }
-
-                if (asChar == '\n')
-                {
-                    Console.WriteLine();
-                    continue;
-                }
+                inp = "";
             }
 
-            return IntCodeProgram.Output;
+            IntCodeProgram.LoopUntilHalt(0);
+            var locationState = IntCodeProgram.Output;
+
+            if (locationState > 127)
+            {
+                Console.WriteLine(locationState);
+                break;
+            }
+
+            var asChar = (char)locationState;
+            Console.Write(asChar);
+
+            if (asChar == '?')
+            {
+                inp = Console.ReadLine();
+            }
+
+            if (asChar == '\n')
+            {
+                Console.WriteLine();
+                continue;
+            }
         }
+
+        return IntCodeProgram.Output;
     }
 }

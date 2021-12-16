@@ -1,8 +1,7 @@
-﻿namespace AoC.Common
+﻿namespace AoC.Common;
+
+public interface IDay
 {
-    public interface IDay
-    {
-        void Run();
-        string Title { get; }
-    }
+    void Run();
+    string Title { get; }
 }

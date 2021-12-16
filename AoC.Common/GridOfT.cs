@@ -1,49 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace AoC.Common;
 
-namespace AoC.Common
+public class Grid2D<TValue> where TValue : class, ICoordinate
 {
-    public class Grid2D<TValue> where TValue : class, ICoordinate
-    {
-        private readonly List<TValue> _allItems = new List<TValue>();
+    private readonly List<TValue> _allItems = new List<TValue>();
 
-        
+
+}
+
+public class Grid<TKey, TValue>
+    where TKey : struct
+    where TValue : class
+{
+    private readonly Dictionary<TKey, TValue> _storage = new Dictionary<TKey, TValue>();
+
+    public List<TValue> GetAll()
+    {
+        return _storage.Values.ToList();
     }
 
-    public class Grid<TKey,TValue> 
-        where TKey : struct 
-        where TValue : class
+    public bool TryGet(TKey key, out TValue p)
     {
-        private readonly Dictionary<TKey, TValue> _storage = new Dictionary<TKey, TValue>();
+        var result = _storage.TryGetValue(key, out var point);
+        p = point;
 
-        public List<TValue> GetAll()
+        return result;
+    }
+
+    public bool Add(TKey key, TValue point)
+    {
+        if (_storage.ContainsKey(key))
         {
-            return _storage.Values.ToList();
+            return false;
         }
 
-        public bool TryGet(TKey key, out TValue p)
-        {
-            var result = _storage.TryGetValue(key, out var point);
-            p = point;
+        _storage[key] = point;
+        return true;
+    }
 
-            return result;
-        }
+    public bool Remove(TKey key)
+    {
+        return _storage.Remove(key);
+    }
 
-        public bool Add(TKey key, TValue point)
+    public IEnumerable<TValue> GetForKeys(IEnumerable<TKey> keys)
+    {
+        foreach (var key in keys)
         {
-            if (_storage.ContainsKey(key))
+            if (TryGet(key, out var value))
             {
-                return false;
+                yield return value;
             }
-
-            _storage[key] = point;
-            return true;
-        }
-
-        public bool Remove(TKey key)
-        {
-            return _storage.Remove(key);
         }
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace AoC.Common
+﻿namespace AoC.Common;
+
+public interface ICoordinate
 {
-    public interface ICoordinate
-    {
-        int Id { get; }
-        Coordinate Coordinate { get; set; }
-    }
+    int Id { get; }
+    Coordinate Coordinate { get; set; }
 }

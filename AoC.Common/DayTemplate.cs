@@ -1,27 +1,21 @@
-﻿using System;
-using AoC.Common;
-using static AoC.Common.SantaHelper;
+﻿namespace AoC;
+/*
 
-namespace AoC
+*/
+
+public class DayTemplate : Day
 {
-    /*
+    public override string Title => "";
 
-    */
-
-    public class DayTemplate : Day
+    public override void PartOne()
     {
-        public override string Title => "";
+        base.PartOne();
+        Console.WriteLine();
+    }
 
-        public override void PartOne()
-        {
-            base.PartOne();
-            Console.WriteLine();
-        }
-
-        public override void PartTwo()
-        {
-            base.PartTwo();
-            Console.WriteLine();
-        }
+    public override void PartTwo()
+    {
+        base.PartTwo();
+        Console.WriteLine();
     }
 }

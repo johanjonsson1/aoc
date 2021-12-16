@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AoC.Common;
-
-namespace AoC2018
+﻿namespace AoC2018
 {
     /*
     --- Day 24: Immune System Simulator 20XX ---
@@ -372,7 +367,8 @@ namespace AoC2018
                 GetGroups(combatingGroups);
 
                 combatingGroups.Where(x => x.Type == GroupType.ImmuneSystem).ToList()
-                    .ForEach(g => {
+                    .ForEach(g =>
+                    {
                         g.UnitAttackDamage += boost;
                     });
 
@@ -836,7 +832,7 @@ public class Group
         else if (Annihilated)
         {
             Target.IsSelected = false;
-            Target = null;            
+            Target = null;
             return;
         }
 
@@ -844,7 +840,7 @@ public class Group
         Target.Units -= unitsToKill;
 
         Target.IsSelected = false;
-        Target = null;        
+        Target = null;
     }
 
     public int DamageDealtBy(Group enemy)
