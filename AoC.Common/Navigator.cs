@@ -126,8 +126,8 @@ public class Navigator
                 throw new ArgumentException();
         }
 
-        int newX = oldPos.X;
-        int newY = oldPos.Y;
+        var newX = oldPos.X;
+        var newY = oldPos.Y;
 
         // add coordinates between coordinates if distance is greater than one
         while (newX != CurrentCoordinate.X || newY != CurrentCoordinate.Y)

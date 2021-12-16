@@ -55,7 +55,7 @@ public class Day1 : IDay
 
         var resultSet = new List<int>();
         var matchCounter = 0;
-        int last = 0;
+        var last = 0;
         foreach (var item in numbers)
         {
             if (item == last)
@@ -93,7 +93,7 @@ public class Day1 : IDay
         numbers.AddRange(fakeCircular);
 
         var resultSet = new List<int>();
-        for (int i = 0; i < originalInput.Length; i++)
+        for (var i = 0; i < originalInput.Length; i++)
         {
             var el = numbers.ElementAt(i);
             if (el == numbers.ElementAt(i + half))

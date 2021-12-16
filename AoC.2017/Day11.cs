@@ -49,8 +49,8 @@ public class Day11 : Day
         var startHex = new Point3D<Hex>(0, 0, 0, emptyHex);
         Grid.Add(startHex.Coordinate, startHex);
 
-        Point3D<Hex> current = startHex;
-        for (int i = 0; i < input.Length; i++)
+        var current = startHex;
+        for (var i = 0; i < input.Length; i++)
         {
             var adjacent = current.CreateAdjacent(input[i]);
             Grid.Add(adjacent.Coordinate, adjacent);
@@ -65,12 +65,12 @@ public class Day11 : Day
     public override void PartTwo()
     {
         base.PartTwo();
-        int maxDistance = 0;
+        var maxDistance = 0;
 
         var allPoints = Grid.GetAll();
         var start = allPoints.First();
 
-        for (int i = 1; i < allPoints.Count; i++)
+        for (var i = 1; i < allPoints.Count; i++)
         {
             var distance = HexExtensions.GetDistance(start, allPoints[i]);
 

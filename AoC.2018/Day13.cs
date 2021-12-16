@@ -284,9 +284,9 @@ public class Day13 : Day
     private static void BuildTracksWithCarts(List<string> trackMap)
     {
         var idTracker = 1;
-        for (int y = 0; y < trackMap.Count; y++)
+        for (var y = 0; y < trackMap.Count; y++)
         {
-            for (int x = 0; x < trackMap[y].Length; x++)
+            for (var x = 0; x < trackMap[y].Length; x++)
             {
                 var currentSquare = trackMap[y][x];
                 if (currentSquare == ' ')

@@ -15,7 +15,7 @@ public class Day10 : IDay
 
         var circularList = new List<ListValue>();
 
-        for (int i = 0; i <= 255; i++)
+        for (var i = 0; i <= 255; i++)
         {
             circularList.Add(new ListValue(i, i));
         }
@@ -35,7 +35,7 @@ public class Day10 : IDay
         //Console.WriteLine(answer);
 
         //part two
-        for (int i = 0; i < 64; i++)
+        for (var i = 0; i < 64; i++)
         {
             foreach (var length in lengths)
             {
@@ -56,7 +56,7 @@ public class Day10 : IDay
 
         var circularList = new List<ListValue>();
 
-        for (int i = 0; i <= 255; i++)
+        for (var i = 0; i <= 255; i++)
         {
             circularList.Add(new ListValue(i, i));
         }
@@ -65,7 +65,7 @@ public class Day10 : IDay
         var maxSizeIndex = 255;
         var skipSize = 0;
 
-        for (int i = 0; i < 64; i++)
+        for (var i = 0; i < 64; i++)
         {
             foreach (var length in lengths)
             {
@@ -94,7 +94,7 @@ public class Day10 : IDay
 
                 var reversed = partOne.Select(s => s.Value).Reverse().ToArray();
 
-                for (int i = 0; i < partOne.Count; i++)
+                for (var i = 0; i < partOne.Count; i++)
                 {
                     partOne[i].Value = reversed[i];
                 }
@@ -104,7 +104,7 @@ public class Day10 : IDay
                 var partOne = circularList.Where(x => x.Index >= currentPos && x.Index <= newMaxIndex).ToList();
                 var reversed = partOne.Select(s => s.Value).Reverse().ToArray();
 
-                for (int i = 0; i < partOne.Count; i++)
+                for (var i = 0; i < partOne.Count; i++)
                 {
                     partOne[i].Value = reversed[i];
                 }

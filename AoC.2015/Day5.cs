@@ -91,7 +91,7 @@ public class Validator
 
         var result = false;
         var last = ' ';
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
             if (last == input[i])
             {
@@ -123,7 +123,7 @@ public class Validator
         // check pairs
         var pairs = new List<string>();
 
-        for (int i = 0; i < input.Length - 1; i++)
+        for (var i = 0; i < input.Length - 1; i++)
         {
             pairs.Add(input.Substring(i, 2));
         }
@@ -138,7 +138,7 @@ public class Validator
 
         var numberofmatches = pairs.Count - distinctLeft.Count;
 
-        for (int i = 0; i < pairs.Count; i++)
+        for (var i = 0; i < pairs.Count; i++)
         {
             if (pairs[i].First() == pairs[i].Last() && i != pairs.Count - 1)
             {
@@ -156,7 +156,7 @@ public class Validator
         }
 
         // check letter between letters
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
             if (i == input.Length - 2)
             {

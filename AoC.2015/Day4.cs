@@ -40,7 +40,7 @@ public class Day4 : IDay
 
         byte[] data = null;
 
-        using (MD5 md5Hash = MD5.Create())
+        using (var md5Hash = MD5.Create())
         {
             while (notFound)
             {

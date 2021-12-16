@@ -81,11 +81,11 @@ public class Day20 : Day
         var input = Inputs.Day20.ToStringList();
 
         var zero = new Point3D<MovingPoint>(0, 0, 0, new MovingPoint(-1, new int[] { }, new int[] { }));
-        List<Point3D<MovingPoint>> allPoints = CreatePoints(input);
+        var allPoints = CreatePoints(input);
 
         var closest = new List<int>();
 
-        for (int i = 0; i < 10000; i++)
+        for (var i = 0; i < 10000; i++)
         {
             Parallel.ForEach(allPoints, (p) => p.MoveTick());
 
@@ -106,9 +106,9 @@ public class Day20 : Day
         var input = Inputs.Day20.ToStringList();
 
         var zero = new Point3D<MovingPoint>(0, 0, 0, new MovingPoint(-1, new int[] { }, new int[] { }));
-        List<Point3D<MovingPoint>> allPoints = CreatePoints(input);
+        var allPoints = CreatePoints(input);
 
-        for (int i = 0; i < 1000; i++)
+        for (var i = 0; i < 1000; i++)
         {
             Parallel.ForEach(allPoints.Where(ap => !ap.Item.Destroyed), (p) => p.MoveTick());
 

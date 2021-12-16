@@ -65,7 +65,7 @@ public class Day3 : Day
 
         var result = 0;
 
-        for (int i = 0; i < trianglesCol.Count; i += 3)
+        for (var i = 0; i < trianglesCol.Count; i += 3)
         {
             var triGrp = new List<int> { trianglesCol[i], trianglesCol[i + 1], trianglesCol[i + 2] }.OrderBy(o => o).ToList();
 

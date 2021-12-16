@@ -60,7 +60,7 @@ public class Day5 : Day
         while (continueWhile)
         {
             continueWhile = false;
-            for (int i = charArray.Count - 1; i >= 0; i--)
+            for (var i = charArray.Count - 1; i >= 0; i--)
             {
                 if (i > 0)
                 {
@@ -95,7 +95,7 @@ public class Day5 : Day
             while (continueWhile)
             {
                 continueWhile = false;
-                for (int i = charArray.Count - 1; i >= 0; i--)
+                for (var i = charArray.Count - 1; i >= 0; i--)
                 {
                     if (char.ToLower(charArray[i]) == letter)
                     {
@@ -110,7 +110,7 @@ public class Day5 : Day
             while (continueWhile)
             {
                 continueWhile = false;
-                for (int i = charArray.Count - 1; i >= 0; i--)
+                for (var i = charArray.Count - 1; i >= 0; i--)
                 {
                     if (i > 0)
                     {

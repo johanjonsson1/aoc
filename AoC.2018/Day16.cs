@@ -174,7 +174,7 @@ public class Day16 : Day
 
     private static void PopulateSamples(List<string> input, List<Sample> samples)
     {
-        for (int i = 0; i < input.Count; i += 3)
+        for (var i = 0; i < input.Count; i += 3)
         {
             var sample = new Sample();
             var splitBefore = input[i].RemoveAToZ().SplitAsIntsBy(':', '[', ']', ',');

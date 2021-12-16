@@ -96,7 +96,7 @@ seti 5 0 2";
 
         var results = new List<Result>();
 
-        for (int i = 7586220; i < int.MaxValue; i++)
+        for (var i = 7586220; i < int.MaxValue; i++)
         {
             var register = new BigRegister { A = i };
             var numberOfInstructions = 0;

@@ -70,7 +70,7 @@ public class Day9 : Day
         // part2 
         long expected = 90433990;
 
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
             var sum = input[i];
 
@@ -82,7 +82,7 @@ public class Day9 : Day
             var currentList = new List<long>();
             currentList.Add(sum);
 
-            for (int j = i + 1; j < input.Length; j++)
+            for (var j = i + 1; j < input.Length; j++)
             {
                 sum += input[j];
                 currentList.Add(input[j]);

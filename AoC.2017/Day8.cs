@@ -15,7 +15,7 @@ c inc -20 if c == 10";
 
         foreach (var instruction in input)
         {
-            Instruction inst = ConvertToInstruction(instruction);
+            var inst = ConvertToInstruction(instruction);
             ProcessInstruction(inst, store);
         }
 

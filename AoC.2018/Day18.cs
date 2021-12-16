@@ -175,10 +175,10 @@ public class Day18 : Day
     public override void PartOne()
     {
         base.PartOne();
-        List<Acre> initialAcres = CreateInitialAcres();
+        var initialAcres = CreateInitialAcres();
         var next = initialAcres;
 
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
             var current = next;
             next = new List<Acre>();
@@ -204,12 +204,12 @@ public class Day18 : Day
     public override void PartTwo()
     {
         base.PartTwo();
-        List<Acre> initialAcres = CreateInitialAcres();
+        var initialAcres = CreateInitialAcres();
         var next = initialAcres;
         var values2 = new List<Tuple<int, int>>();
         var firstResult = 0;
 
-        for (int i = 0; i < 500; i++)
+        for (var i = 0; i < 500; i++)
         {
             var current = next;
             next = new List<Acre>();
@@ -306,9 +306,9 @@ public class Day18 : Day
 
         var input = Inputs.Day18.ToStringList();
 
-        for (int y = 0; y < input.Count; y++)
+        for (var y = 0; y < input.Count; y++)
         {
-            for (int x = 0; x < input[y].Length; x++)
+            for (var x = 0; x < input[y].Length; x++)
             {
                 initialAcres.Add(new Acre(x, y, GetAcreType(input[y][x])));
             }
@@ -382,9 +382,9 @@ public class Day18 : Day
     private void Print(List<Acre> acres)
     {
         Console.WriteLine();
-        for (int i = 0; i < 10; i++)
+        for (var i = 0; i < 10; i++)
         {
-            for (int j = 0; j < 10; j++)
+            for (var j = 0; j < 10; j++)
             {
                 var first = acres.First(a => a.X == j && a.Y == i);
 

@@ -224,7 +224,7 @@ L.LLLLL.LL";
                 neighbours = grid.GetForKeys(this.Coordinate.GetAdjacentPlusDiag());
             }
 
-            int limit = advancedFind ? 5 : 4;
+            var limit = advancedFind ? 5 : 4;
 
             switch (State)
             {

@@ -77,14 +77,14 @@ public class Day14 : Day
         var initialScores = "37".ToInts();
         var manyRecipes = int.Parse("030121");
         var recipes = new CircularRecipes();
-        for (int i = 0; i < initialScores.Count; i++)
+        for (var i = 0; i < initialScores.Count; i++)
         {
             recipes.Add(new Recipe { Id = i, Score = initialScores[i] });
         }
 
         var elfes = new List<KitchenElf> { new KitchenElf(1, recipes.Recipes[0]), new KitchenElf(2, recipes.Recipes[1]) };
 
-        for (int i = 0; i < manyRecipes + 10; i++)
+        for (var i = 0; i < manyRecipes + 10; i++)
         {
             //Print(recipes, elfes);
             var sum = elfes.Sum(s => s.CurrentRecipe.Score);
@@ -104,7 +104,7 @@ public class Day14 : Day
         var initialScores = "37".ToInts();
         var input = "030121";
         var recipes = new FastCircularRecipes();
-        for (int i = 0; i < initialScores.Count; i++)
+        for (var i = 0; i < initialScores.Count; i++)
         {
             recipes.Add(initialScores[i]);
         }
@@ -214,7 +214,7 @@ public class FastCircularRecipes
 
     public int GetNext(int currentIndex, int steps)
     {
-        for (int i = 0; i < steps; i++)
+        for (var i = 0; i < steps; i++)
         {
             currentIndex = NextIndex(currentIndex);
         }
@@ -231,7 +231,7 @@ public class FastCircularRecipes
 
         var s = "";
 
-        for (int i = Recipes.Count - 6; i < Recipes.Count; i++)
+        for (var i = Recipes.Count - 6; i < Recipes.Count; i++)
         {
             s += Recipes[i];
         }
@@ -272,7 +272,7 @@ public class CircularRecipes
     {
         var currentIndex = Recipes.IndexOf(current);
 
-        for (int i = 0; i < steps; i++)
+        for (var i = 0; i < steps; i++)
         {
             currentIndex = NextIndex(currentIndex);
         }
@@ -289,7 +289,7 @@ public class CircularRecipes
 
         var s = "";
 
-        for (int i = Recipes.Count - 6; i < Recipes.Count; i++)
+        for (var i = Recipes.Count - 6; i < Recipes.Count; i++)
         {
             s += Recipes[i].Score;
         }

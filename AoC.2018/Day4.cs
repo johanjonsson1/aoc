@@ -94,7 +94,7 @@ public class Day4 : Day
             if (entryType == "Guard")
             {
                 var guardId = split[3];
-                if (_guards.TryGetValue(guardId, out Guard guard))
+                if (_guards.TryGetValue(guardId, out var guard))
                 {
                     currentGuard = guard;
                 }

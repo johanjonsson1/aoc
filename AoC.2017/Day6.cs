@@ -61,7 +61,7 @@ public class Day6 : IDay
         var test = @"";
         var input = test.ToStringList();
 
-        List<MemoryBank> memory = CreateMemoryBanks("5 1 10 0 1 7 13 14 3 12 8 10 7 12 0 6");
+        var memory = CreateMemoryBanks("5 1 10 0 1 7 13 14 3 12 8 10 7 12 0 6");
         //List<MemoryBank> memory = CreateMemoryBanks("2 4 1 2");
         var configs = new List<string>();
         var reallocs = 0;
@@ -71,10 +71,10 @@ public class Day6 : IDay
 
         while (true)
         {
-            MemoryBank biggestBank = GetBiggestMemBank(memory);
+            var biggestBank = GetBiggestMemBank(memory);
             ReAllocateMemory(memory, biggestBank);
             reallocs++;
-            string cfg = GetCurrentConfig(memory);
+            var cfg = GetCurrentConfig(memory);
 
             if (configs.Any(x => x == cfg))
             {
@@ -108,7 +108,7 @@ public class Day6 : IDay
         var currentIndex = biggestBank.Id;
         var indexesInMemory = memory.Count - 1;
 
-        for (int i = 0; i < blocksToDistribute; i++)
+        for (var i = 0; i < blocksToDistribute; i++)
         {
             if (currentIndex == indexesInMemory)
             {
@@ -134,7 +134,7 @@ public class Day6 : IDay
         var memory = new List<MemoryBank>();
         var asInts = input.Split(' ').Select(s => int.Parse(s)).ToArray();
 
-        for (int i = 0; i < asInts.Length; i++)
+        for (var i = 0; i < asInts.Length; i++)
         {
             memory.Add(new MemoryBank { Id = i, Blocks = asInts[i] });
         }

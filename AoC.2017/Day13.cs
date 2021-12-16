@@ -113,7 +113,7 @@ public class Day13 : Day
         var maxDepth = firewall.Max(m => m.Depth);
         var accumulatedSeverity = 0;
 
-        for (int layer = 0; layer <= maxDepth; layer++)
+        for (var layer = 0; layer <= maxDepth; layer++)
         {
             var catchingScanner = firewall.FirstOrDefault(x => x.Depth == layer && x.IsOnTop);
             if (catchingScanner != null)

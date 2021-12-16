@@ -255,9 +255,9 @@ public class Day6 : Day
         MaxX = PointsOrderedX.First().X;
         MaxY = PointsOrderedY.First().Y;
 
-        for (int x = MinX; x < MaxX; x++)
+        for (var x = MinX; x < MaxX; x++)
         {
-            for (int y = MinY; y < MaxY; y++)
+            for (var y = MinY; y < MaxY; y++)
             {
                 Grid.Add(new Point(x, y));
             }
@@ -339,7 +339,7 @@ public class PointEqualityComparer : IEqualityComparer<Point>
 
     public int GetHashCode(Point bx)
     {
-        int hCode = bx.X ^ bx.Y;
+        var hCode = bx.X ^ bx.Y;
         return hCode.GetHashCode();
     }
 }

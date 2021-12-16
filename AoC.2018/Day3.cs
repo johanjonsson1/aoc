@@ -84,11 +84,11 @@ public class Day3 : Day
             var timesX = Convert.ToInt32(area.Split('x')[0]);
             var timesY = Convert.ToInt32(area.Split('x')[1]);
 
-            for (int i = 0; i < timesX; i++)
+            for (var i = 0; i < timesX; i++)
             {
                 var newX = startLeftX + i;
 
-                for (int j = 0; j < timesY; j++)
+                for (var j = 0; j < timesY; j++)
                 {
                     var newY = startTopY + j;
                     var sqInch = new SquareInch
@@ -155,7 +155,7 @@ public class SquareInchEqualityComparer : IEqualityComparer<SquareInch>
 
     public int GetHashCode(SquareInch bx)
     {
-        int hCode = bx.X ^ bx.Y;
+        var hCode = bx.X ^ bx.Y;
         return hCode.GetHashCode();
     }
 }

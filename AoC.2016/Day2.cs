@@ -97,7 +97,7 @@ public class Day2 : Day
         var instructions = Inputs.Day2.ToStringList();
         KeypadInstruction.KeyPad = _keyPad;
         KeypadInstruction.CurrentButton = _keyPad.FirstOrDefault(x => x.NumberOrChar == "5");
-        string result = TapKeys(instructions);
+        var result = TapKeys(instructions);
 
         Console.WriteLine("Result part 1");
         Console.WriteLine(result);
@@ -112,7 +112,7 @@ public class Day2 : Day
         var instructions = Inputs.Day2.ToStringList();
         KeypadInstruction.KeyPad = _specialKeyPad;
         KeypadInstruction.CurrentButton = _keyPad.FirstOrDefault(x => x.NumberOrChar == "5");
-        string result = TapKeys(instructions);
+        var result = TapKeys(instructions);
 
         Console.WriteLine("Result part 2");
         Console.WriteLine(result);
@@ -139,7 +139,7 @@ public class Day2 : Day
 
         public static void Move(string instruction)
         {
-            for (int i = 0; i < instruction.Length; i++)
+            for (var i = 0; i < instruction.Length; i++)
             {
                 var next = instruction[i];
                 Coordinate newCoordinate;

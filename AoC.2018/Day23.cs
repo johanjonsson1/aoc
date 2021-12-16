@@ -95,16 +95,16 @@ public class Day23 : Day
         var minZ = minX;
         var bots = GetNanobots(input);
 
-        int divider = 1000000;
+        var divider = 1000000;
         var simplifiedBots = GetSimplifiedBots(bots, divider, ref maxX, ref maxY, ref maxZ, ref minX, ref minY, ref minZ);
         while (divider > 1)
         {
             var tempResult = new Handler();
             Parallel.For(minX, maxX, x =>
             {
-                for (int y = minY; y < maxY; y++)
+                for (var y = minY; y < maxY; y++)
                 {
-                    for (int z = minZ; z < maxZ; z++)
+                    for (var z = minZ; z < maxZ; z++)
                     {
                         var count = 0;
                         foreach (var bot in simplifiedBots)
@@ -141,9 +141,9 @@ public class Day23 : Day
         var result = new Handler();
         Parallel.For(minX, maxX, x =>
         {
-            for (int y = minY; y < maxY; y++)
+            for (var y = minY; y < maxY; y++)
             {
-                for (int z = minZ; z < maxZ; z++)
+                for (var z = minZ; z < maxZ; z++)
                 {
                     var count = 0;
                     foreach (var bot in bots)
@@ -328,11 +328,11 @@ public class Nanobot : Position
     public List<Position> PositionsInRange()
     {
         var positions = new List<Position>();
-        for (int x = X - Signal; x < X + Signal; x++)
+        for (var x = X - Signal; x < X + Signal; x++)
         {
-            for (int y = Y - Signal; y < Y + Signal; y++)
+            for (var y = Y - Signal; y < Y + Signal; y++)
             {
-                for (int z = Z - Signal; z < Z + Signal; z++)
+                for (var z = Z - Signal; z < Z + Signal; z++)
                 {
                     positions.Add(new Position(x, y, z));
                 }

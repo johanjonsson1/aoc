@@ -167,7 +167,7 @@ public class PointXyComparer : IEqualityComparer<PointXy>
 
     public int GetHashCode(PointXy obj)
     {
-        int hCode = obj.X ^ obj.Y;
+        var hCode = obj.X ^ obj.Y;
         return hCode.GetHashCode();
     }
 }

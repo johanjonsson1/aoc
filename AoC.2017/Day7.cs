@@ -39,9 +39,9 @@ cntj (57)";
         var lastRemainging = allDiscPrograms.SingleOrDefault();
 
         var diff = 0;
-        int[] oldWeights = new int[2];
+        var oldWeights = new int[2];
         var currentFaulty = lastRemainging;
-        for (int i = 0; i < lastRemainging.Levels; i++)
+        for (var i = 0; i < lastRemainging.Levels; i++)
         {
             bool thisWeightFaulty;
             var weights = currentFaulty.SubDiscPrograms.Select(s => s.TotalWeight).Distinct().ToArray();
@@ -90,7 +90,7 @@ cntj (57)";
     {
         while (allDiscPrograms.Count > 1)
         {
-            for (int i = allDiscPrograms.Count - 1; i >= 0; i--)
+            for (var i = allDiscPrograms.Count - 1; i >= 0; i--)
             {
                 var current = allDiscPrograms[i];
                 if (current.IsFilled)

@@ -156,8 +156,8 @@ public class Navigator
             return;
         }
 
-        int newX = oldPos.X;
-        int newY = oldPos.Y;
+        var newX = oldPos.X;
+        var newY = oldPos.Y;
 
         while (newX != CurrentCoordinate.X || newY != CurrentCoordinate.Y)
         {

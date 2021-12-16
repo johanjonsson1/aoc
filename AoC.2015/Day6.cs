@@ -145,9 +145,9 @@ public class LightGrid
         // y 2 x 1
         // y 2 x 2
 
-        for (int y = 0; y < squareSize; y++)
+        for (var y = 0; y < squareSize; y++)
         {
-            for (int x = 0; x < squareSize; x++)
+            for (var x = 0; x < squareSize; x++)
             {
                 Grid.Add(new Light(x, y));
             }

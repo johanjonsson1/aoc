@@ -104,7 +104,7 @@ public class Day11 : Day
 
         Console.WriteLine();
         Point300 max = null;
-        int totalPower = int.MinValue;
+        var totalPower = int.MinValue;
 
         foreach (var point300 in allPoints)
         {
@@ -140,7 +140,7 @@ public class Day11 : Day
                 Console.Write(".");
             }
 
-            for (int edge = 300; edge > 1; edge--)
+            for (var edge = 300; edge > 1; edge--)
             {
                 var powerLevel = point300.GetTotalPowerLevel(allPoints, edge, edge - 1);
                 CheckValue(point300, powerLevel, edge);
@@ -167,9 +167,9 @@ public class Day11 : Day
     {
         var idCounter = 1;
 
-        for (int x = StartIndex; x <= MaxX; x++)
+        for (var x = StartIndex; x <= MaxX; x++)
         {
-            for (int y = StartIndex; y <= MaxY; y++)
+            for (var y = StartIndex; y <= MaxY; y++)
             {
                 allPoints.Add(new Point300(idCounter, x, y, serial));
                 idCounter++;

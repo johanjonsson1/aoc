@@ -61,7 +61,7 @@ public class Day1 : Day
         var inputs = Inputs.Day1.SplitAsIntsBy(NewlineCarriageReturn);
 
         var duplicateFrequencyFound = false;
-        int currentFrequency = 0;
+        var currentFrequency = 0;
         var allFrequencies = new HashSet<int>();
 
         while (!duplicateFrequencyFound)

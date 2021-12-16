@@ -1,22 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\AoC.2015\AoC.2015.csproj" />
-    <ProjectReference Include="..\AoC.2016\AoC.2016.csproj" />
-    <ProjectReference Include="..\AoC.2017\AoC.2017.csproj" />
-    <ProjectReference Include="..\AoC.2018\AoC.2018.csproj" />
-    <ProjectReference Include="..\AoC.2019\AoC.2019.csproj" />
-    <ProjectReference Include="..\AoC.2020\AoC.2020.csproj" />
-    <ProjectReference Include="..\AoC.Common\AoC.Common.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\AoC.2015\AoC.2015.csproj" />
+		<ProjectReference Include="..\AoC.2016\AoC.2016.csproj" />
+		<ProjectReference Include="..\AoC.2017\AoC.2017.csproj" />
+		<ProjectReference Include="..\AoC.2018\AoC.2018.csproj" />
+		<ProjectReference Include="..\AoC.2019\AoC.2019.csproj" />
+		<ProjectReference Include="..\AoC.2020\AoC.2020.csproj" />
+		<ProjectReference Include="..\AoC.2021\AoC.2021.csproj" />
+		<ProjectReference Include="..\AoC.Common\AoC.Common.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -211,10 +211,10 @@ public class Day10 : Day
 
     private static void PrintMessage(List<MessagePoint> allPoints)
     {
-        for (int y = (int)MinimumY; y <= MaximumY; y++)
+        for (var y = (int)MinimumY; y <= MaximumY; y++)
         {
             Console.WriteLine();
-            for (int x = (int)MinimumX; x <= MaximumX; x++)
+            for (var x = (int)MinimumX; x <= MaximumX; x++)
             {
                 if (allPoints.Any(a => a.Y == y && a.X == x))
                 {

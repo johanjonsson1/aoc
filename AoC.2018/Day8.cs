@@ -93,8 +93,8 @@ public class Day8 : Day
 
     private Node FindNodes(List<int> input, ref int index)
     {
-        Node node = new Node();
-        int startIndex = index;
+        var node = new Node();
+        var startIndex = index;
 
         node.Header.NumberOfNodes = input[startIndex];
         node.Header.NumberOfMetadata = input[startIndex + 1];
@@ -102,7 +102,7 @@ public class Day8 : Day
         index += 2;
         if (node.Header.NumberOfNodes > 0)
         {
-            for (int i = 0; i < node.Header.NumberOfNodes; i++)
+            for (var i = 0; i < node.Header.NumberOfNodes; i++)
             {
                 node.SubNodes.Add(FindNodes(input, ref index));
             }
@@ -110,7 +110,7 @@ public class Day8 : Day
 
         if (node.Header.NumberOfMetadata > 0)
         {
-            for (int i = 0; i < node.Header.NumberOfMetadata; i++)
+            for (var i = 0; i < node.Header.NumberOfMetadata; i++)
             {
                 node.Metadata.Add(input[index]);
                 index++;
@@ -122,7 +122,7 @@ public class Day8 : Day
 
     private static void OldMethod(List<int> input, List<Node> allNodes)
     {
-        for (int i = input.Count - 1; i >= 0; i--)
+        for (var i = input.Count - 1; i >= 0; i--)
         {
             var currentHeaderIndex = new { Nodes = i - 1, Metadata = i };
 
@@ -136,7 +136,7 @@ public class Day8 : Day
             var nodes = new List<Node>();
             var metadata = new List<int>();
 
-            for (int j = currentHeaderIndex.Metadata + 1; j < input.Count; j++)
+            for (var j = currentHeaderIndex.Metadata + 1; j < input.Count; j++)
             {
                 var node = allNodes.FirstOrDefault(f => f.NodeIndex == j);
                 if (node != null)

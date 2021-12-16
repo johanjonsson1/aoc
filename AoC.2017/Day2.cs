@@ -100,13 +100,13 @@ public class SpreadRow
         var orderedNumbers = _numbers.OrderByDescending(n => n).ToList();
         var sum = 0;
 
-        for (int i = 0; i < orderedNumbers.Count - 1; i++)
+        for (var i = 0; i < orderedNumbers.Count - 1; i++)
         {
             var currentIndex = i;
 
-            for (int j = currentIndex; j < orderedNumbers.Count - 1; j++)
+            for (var j = currentIndex; j < orderedNumbers.Count - 1; j++)
             {
-                int remainder = 0;
+                var remainder = 0;
                 var result = Math.DivRem(orderedNumbers[currentIndex], orderedNumbers[j + 1], out remainder);
 
                 if (remainder == 0)

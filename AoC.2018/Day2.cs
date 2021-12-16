@@ -90,14 +90,14 @@ public class Day2 : Day
         var input = Inputs.Day2.ToStringList();
         input = input.OrderBy(o => o).ToList();
 
-        for (int i = 0; i < input.Count; i++)
+        for (var i = 0; i < input.Count; i++)
         {
             var current = input.ElementAt(i);
             var next = input.ElementAt(i + 1);
             var diff = 0;
-            char diffLetter = ' ';
+            var diffLetter = ' ';
 
-            for (int j = 0; j < current.Count(); j++)
+            for (var j = 0; j < current.Count(); j++)
             {
                 if (current[j] != next[j])
                 {

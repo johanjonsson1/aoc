@@ -71,7 +71,7 @@ public class Day16 : Day
         var length = moves.Length;
         var combinations = new List<string> { Order };
 
-        int billion = 1;
+        var billion = 1;
         while (billion < 1_000_000_000)
         {
             var counter = 0;

@@ -220,7 +220,7 @@ public class Day17 : Day
         //PrintConsole();
         while (true)
         {
-            int i = 0;
+            var i = 0;
             var max = activeWater.Count;
             while (i < max)
             {
@@ -279,7 +279,7 @@ public class Day17 : Day
 
         var water = All.Values.Where(x => x.IsWater && x.Infinite).ToList();
 
-        int i = 0;
+        var i = 0;
         var count = water.Count;
 
         while (i < count)
@@ -313,9 +313,9 @@ public class Day17 : Day
     {
         Console.WriteLine();
         var water = All.Values.Where(x => x.IsWater).ToList();
-        for (int i = MinY; i <= MaxY; i++)
+        for (var i = MinY; i <= MaxY; i++)
         {
-            for (int j = MinX - 1; j <= MaxX + 1; j++)
+            for (var j = MinX - 1; j <= MaxX + 1; j++)
             {
                 if (All.Values.Any(a => a.IsClay && a.Coordinate.X == j && a.Coordinate.Y == i))
                 {
@@ -357,12 +357,12 @@ public class Day17 : Day
         var date = DateTime.UtcNow.Ticks;
         var water = All.Values.Where(x => x.IsWater).ToList();
         var clay = All.Values.Where(x => x.IsClay).ToList();
-        using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"buckets_" + date + ".txt", false))
+        using (var file = new System.IO.StreamWriter(@"buckets_" + date + ".txt", false))
         {
             file.WriteLine();
-            for (int i = MinY; i <= MaxY; i++)
+            for (var i = MinY; i <= MaxY; i++)
             {
-                for (int j = MinX - 1; j <= MaxX + 1; j++)
+                for (var j = MinX - 1; j <= MaxX + 1; j++)
                 {
                     if (clay.Any(a => a.Coordinate.X == j && a.Coordinate.Y == i))
                     {
@@ -429,7 +429,7 @@ public class Day17 : Day
                 MaybeSetX(x);
                 MaybeSetY(yStart, yEnd);
 
-                for (int y = yStart; y <= yEnd; y++)
+                for (var y = yStart; y <= yEnd; y++)
                 {
                     var ground = new GroundProperty(x, y, false, true);
                     if (!groundGrid.ContainsKey(ground.Coordinate))
@@ -447,7 +447,7 @@ public class Day17 : Day
                 MaybeSetX(xStart, xEnd);
                 MaybeSetY(y);
 
-                for (int x = xStart; x <= xEnd; x++)
+                for (var x = xStart; x <= xEnd; x++)
                 {
                     var ground = new GroundProperty(x, y, false, true);
                     if (!groundGrid.ContainsKey(ground.Coordinate))

@@ -364,9 +364,9 @@ public class Day22 : Day
         base.PartOne();
 
         var regions = new List<SquareRegion>();
-        for (int y = 0; y <= TargetY; y++)
+        for (var y = 0; y <= TargetY; y++)
         {
-            for (int x = 0; x <= TargetX; x++)
+            for (var x = 0; x <= TargetX; x++)
             {
                 regions.Add(new SquareRegion(x, y, regions));
             }

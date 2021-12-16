@@ -134,7 +134,7 @@ public class Day12 : Day
         SavePatterns();
         var currentGeneration = CreateFirstGeneration();
 
-        for (int gen = 0; gen < 20; gen++)
+        for (var gen = 0; gen < 20; gen++)
         {
             var currentGenPots = currentGeneration.GetGeneration();
             //Console.WriteLine(currentGeneration.ToString());
@@ -172,7 +172,7 @@ public class Day12 : Day
         var diffMatches = 0;
         var breakAtGen = 0;
 
-        for (int gen = 0; gen < 10000; gen++)
+        for (var gen = 0; gen < 10000; gen++)
         {
             var currentGenPots = currentGeneration.GetGeneration();
             var nextGeneration = new PlantGeneration();
@@ -287,7 +287,7 @@ public class PlantGeneration
         var leftMost = Pots.First().Position;
         var rightMost = Pots.Last().Position;
 
-        for (int i = 0; i < 4; i++)
+        for (var i = 0; i < 4; i++)
         {
             leftMost--;
             rightMost++;

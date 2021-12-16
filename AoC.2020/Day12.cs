@@ -48,7 +48,7 @@ F11";
                 case 'L':
                 {
                     var turns = number / 90;
-                    for (int i = 0; i < turns; i++)
+                    for (var i = 0; i < turns; i++)
                     {
                         navigator.TurnLeft();
                     }
@@ -58,7 +58,7 @@ F11";
                 case 'R':
                 {
                     var turns = number / 90;
-                    for (int i = 0; i < turns; i++)
+                    for (var i = 0; i < turns; i++)
                     {
                         navigator.TurnRight();
                     }

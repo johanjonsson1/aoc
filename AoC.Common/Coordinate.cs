@@ -56,7 +56,7 @@ public struct Coordinate : IEquatable<Coordinate>
     {
         double deltaY = (Y - other.Y);
         double deltaX = (X - other.X);
-        double result = Math.Atan2(deltaY, deltaX);
+        var result = Math.Atan2(deltaY, deltaX);
 
         result = Math.Round((result * (180 / Math.PI)), 2);
 
@@ -72,7 +72,7 @@ public struct Coordinate : IEquatable<Coordinate>
     {
         double deltaY = (Y - other.Y);
         double deltaX = (X - other.X);
-        double result = Math.Atan2(deltaY, deltaX);
+        var result = Math.Atan2(deltaY, deltaX);
 
         result = Math.Round((result * (180 / Math.PI)), 2);
 

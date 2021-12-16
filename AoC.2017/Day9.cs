@@ -38,16 +38,16 @@ public class Day9 : IDay
         //var input = "{{<!!!!>>},,lk}}";
         //var input = "{{<a!>},{<a!>},{<a!>},{<ab>}}";//"{{{},{},{{}}}}"; //"{{<ab>},{<ab>},{<ab>},{<ab>}}"; //"{{{}}}";
         var input = Inputs.Day9;
-        string aa = input;
+        var aa = input;
 
-        bool garbageRemoved = true;
+        var garbageRemoved = true;
         while (garbageRemoved)
         {
             garbageRemoved = TryCleanGarbage(aa, out aa);
         }
 
         var score = 0;
-        bool scoreFound = true;
+        var scoreFound = true;
         while (scoreFound)
         {
             var score2 = 0;
@@ -68,7 +68,7 @@ public class Day9 : IDay
         var nestCounter = 0;
         var nextCharInvalid = false;
 
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
             if (input[i] == '{' && nextCharInvalid == false)
             {
@@ -110,7 +110,7 @@ public class Day9 : IDay
         var garbageEndIndex = -1;
         var nextCharInvalid = false;
 
-        for (int i = 0; i < input.Length; i++)
+        for (var i = 0; i < input.Length; i++)
         {
             if (input[i] == '<' && garbageStartIndex == -1 && nextCharInvalid == false)
             {
@@ -164,7 +164,7 @@ public class Garbage
             var nextCharInvalid = false;
             var trimmed = Characters.Remove(Characters.Length - 1, 1).Remove(0, 1);
 
-            for (int i = 0; i < trimmed.Length; i++)
+            for (var i = 0; i < trimmed.Length; i++)
             {
                 if (nextCharInvalid == false)
                 {

@@ -78,14 +78,14 @@ public class Day9 : Day
 
         var allMarbles = new List<Marble>();
         var large = 71058;
-        for (int i = 1; i <= large; i++)
+        for (var i = 1; i <= large; i++)
         {
             var isDivisible = i % 23 == 0;
             allMarbles.Add(new Marble { Worth = i, Divisible = isDivisible });
         }
 
         var allElves = new Elves();
-        for (int i = 1; i <= 411; i++)
+        for (var i = 1; i <= 411; i++)
         {
             allElves.Add(new Elf { Id = i });
         }
@@ -106,14 +106,14 @@ public class Day9 : Day
 
         var allMarbles = new List<Marble>();
         var large = 71058 * 100;
-        for (int i = 1; i <= large; i++)
+        for (var i = 1; i <= large; i++)
         {
             var isDivisible = i % 23 == 0;
             allMarbles.Add(new Marble { Worth = i, Divisible = isDivisible });
         }
 
         var allElves = new Elves();
-        for (int i = 1; i <= 411; i++)
+        for (var i = 1; i <= 411; i++)
         {
             allElves.Add(new Elf { Id = i });
         }
@@ -150,7 +150,7 @@ public class Circle
             // ge tillbaka marble och 7 bakåt,
             // sätt current till 7an + 1;
             var indexToRemove = CurrentMarbleIndex;
-            for (int i = 0; i < 7; i++)
+            for (var i = 0; i < 7; i++)
             {
                 indexToRemove = PreviousIndex(indexToRemove);
             }
@@ -174,7 +174,7 @@ public class Circle
             else
             {
                 var indexToAddTo = CurrentMarbleIndex;
-                for (int i = 0; i < 2; i++)
+                for (var i = 0; i < 2; i++)
                 {
                     indexToAddTo = NextIndex(indexToAddTo);
                 }
