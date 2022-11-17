@@ -1,4 +1,6 @@
-﻿namespace AoC2021;
+﻿using System.Runtime.InteropServices.ComTypes;
+
+namespace AoC2021;
 
 public class Day4 : Day
 {
