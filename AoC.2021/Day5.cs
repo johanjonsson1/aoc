@@ -2,7 +2,7 @@
 
 public class Day5 : Day
 {
-    public override string Title => "";
+    public override string Title => "--- Day 5: Hydrothermal Venture ---";
 
     public override void PartOne()
     {
