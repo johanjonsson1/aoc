@@ -21,7 +21,7 @@ public class Day7 : Day
             all.Add(new CrabPos(crabPosition, sum));
         }
 
-        Console.WriteLine(all.MinBy(x => x.Fuel));
+        Console.WriteLine(all.MinBy(x => x.Fuel)); //333755
     }
 
     public override void PartTwo()
@@ -49,7 +49,7 @@ public class Day7 : Day
             //Console.WriteLine("Pos: " + crabPosition + " sum: " + sum);
         }
 
-        Console.WriteLine(all2.MinBy(x => x.Fuel));
+        Console.WriteLine(all2.MinBy(x => x.Fuel)); //94017638
 
     }
 }

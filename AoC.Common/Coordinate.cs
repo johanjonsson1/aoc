@@ -29,6 +29,11 @@ public struct Coordinate : IEquatable<Coordinate>
         Y = y;
     }
 
+    public override string ToString()
+    {
+        return $"X: {X}, Y: {Y}";
+    }
+
     public override bool Equals(object obj)
     {
         return obj is Coordinate coordinate &&
