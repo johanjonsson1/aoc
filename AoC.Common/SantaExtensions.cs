@@ -43,6 +43,34 @@ public static class SantaExtensions
         return dict;
     }
 
+    public static List<List<string>> ToColumns(this List<string> input, int columnWidth)
+    {
+        var dict = new Dictionary<int, List<string>>();
+
+        foreach (var line in input)
+        {
+            for (var i = 0; i < line.Length; i += columnWidth)
+            {
+                var i2 = i + columnWidth;
+                while (i2 > line.Length)
+                {
+                    i2--;
+                }
+
+                if (dict.TryGetValue(i, out var entry))
+                {
+                    entry.Add(line[i..i2]);
+                }
+                else
+                {
+                    dict[i] = new List<string> { line[i..i2] };
+                }
+            }
+        }
+
+        return dict.Values.ToList();
+    }
+
     public static List<T> SplitByAs<T>(this string input, Func<string, T> converter, params char[] splitters)
     {
         var a = splitters.ToList();

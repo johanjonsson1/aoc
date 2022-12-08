@@ -1,6 +1,6 @@
 ﻿using AoC.Common;
 
-IDay day = new AoC2021.Day11();
+IDay day = new AoC2022.Day6();
 Console.WriteLine($"Running puzzle {day.Title}");
 day.Run();
 
